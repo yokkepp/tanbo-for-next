@@ -1,5 +1,7 @@
-// import Image from "next/image";
+"use client";
+
 import Header from "../components/Header";
+import { Button, ButtonGroup } from "@chakra-ui/react";
 export default function Home() {
 	return (
 		<>

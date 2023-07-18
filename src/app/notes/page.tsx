@@ -1,5 +1,8 @@
+"use client";
+
 import Header from "@/components/Header";
 import Modal from "@/components/Modal";
+import { List, UnorderedList } from "@chakra-ui/react";
 export default function Notes() {
 	return (
 		<>
@@ -7,24 +10,11 @@ export default function Notes() {
 			<Modal />
 			<div className='flex '>
 				<div className='w-1/5 p-5 overflow-scroll h-screen pt-20'>
-					<ul>
-						<li className='p-4 rounded mb-3 bg-orange-700'>xxxプロジェクト</li>
-						<li className='p-4 rounded mb-3 bg-orange-950'>xxxプロジェクト</li>
-						<li className='p-4 rounded mb-3 bg-orange-950'>xxxプロジェクト</li>
-						<li className='p-4 rounded mb-3 bg-orange-950'>xxxプロジェクト</li>
-						<li className='p-4 rounded mb-3 bg-orange-950'>xxxプロジェクト</li>
-						<li className='p-4 rounded mb-3 bg-orange-950'>xxxプロジェクト</li>
-						<li className='p-4 rounded mb-3 bg-orange-950'>xxxプロジェクト</li>
-						<li className='p-4 rounded mb-3 bg-orange-950'>xxxプロジェクト</li>
-						<li className='p-4 rounded mb-3 bg-orange-950'>xxxプロジェクト</li>
-						<li className='p-4 rounded mb-3 bg-orange-950'>xxxプロジェクト</li>
-						<li className='p-4 rounded mb-3 bg-orange-950'>xxxプロジェクト</li>
-						<li className='p-4 rounded mb-3 bg-orange-950'>xxxプロジェクト</li>
-						<li className='p-4 rounded mb-3 bg-orange-950'>xxxプロジェクト</li>
-						<li className='p-4 rounded mb-3 bg-orange-950'>xxxプロジェクト</li>
-						<li className='p-4 rounded mb-3 bg-orange-950'>xxxプロジェクト</li>
-						<li className='p-4 rounded mb-3 bg-orange-950'>xxxプロジェクト</li>
-					</ul>
+					<UnorderedList>
+						<List className='p-4 rounded mb-3 bg-orange-700'>
+							xxxプロジェクト
+						</List>
+					</UnorderedList>
 				</div>
 				<div className='bg-gray-800 w-3/5 h-screen pt-20 px-10'>
 					<div className='flex justify-between'>
