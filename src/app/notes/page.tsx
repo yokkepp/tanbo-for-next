@@ -1,6 +1,6 @@
 "use client";
-import Header from "@/components/Header";
-import Modal from "@/components/Modal";
+import Header from "@/components/Header/Header";
+import Modal from "@/components/Modal/Modal";
 import {
 	List,
 	UnorderedList,
