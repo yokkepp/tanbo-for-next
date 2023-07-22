@@ -157,7 +157,21 @@ export default function Notes() {
 									borderBottom={"solid"}
 									borderLeft={"solid"}
 									borderColor={"gray.700"}>
-									予定開始日：
+									開始予定：
+								</Box>
+								<Box
+									p={"10px"}
+									borderBottom={"solid"}
+									borderRight={"solid"}
+									borderColor={"gray.700"}>
+									2023/5/15 23:00
+								</Box>
+								<Box
+									p={"10px"}
+									borderBottom={"solid"}
+									borderLeft={"solid"}
+									borderColor={"gray.700"}>
+									終了予定：
 								</Box>
 								<Box
 									p={"10px"}
@@ -170,7 +184,7 @@ export default function Notes() {
 									borderBottom={"solid"}
 									borderLeft={"solid"}
 									borderColor={"gray.700"}>
-									予定終了日：
+									進捗：
 								</Box>
 								<Box
 									p={"10px"}
@@ -178,7 +192,7 @@ export default function Notes() {
 									borderBottom={"solid"}
 									borderRight={"solid"}
 									borderColor={"gray.700"}>
-									2023/10/05 12:00
+									10％
 								</Box>
 							</SimpleGrid>
 						</Box>
