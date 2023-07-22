@@ -47,10 +47,13 @@ export default function Header() {
 			display='flex'
 			bg='gray.700'
 			h={"50px"}
+			w={"100%"}
 			textColor={"white"}
 			px={50}
 			justifyContent={"space-between"}
-			alignItems={"center"}>
+			alignItems={"center"}
+			position={"fixed"}
+			zIndex={"banner"}>
 			<Box display='flex' alignItems={"center"}>
 				<Text mr={50}>TaNBo</Text>
 				{/* TODO: ロゴを画像に差し替える */}
