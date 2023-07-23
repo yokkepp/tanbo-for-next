@@ -19,10 +19,11 @@ import { DeleteIcon } from "@chakra-ui/icons";
 export default function Notes() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [informations, setInformations] = useState([
-		{ title: "タイトル", description: "詳細" },
+		{ title: "タイトル1", description: "詳細1" },
 		{ title: "タイトル2", description: "詳細2" },
+		{ title: "タイトル3", description: "詳細3" },
 	]);
-
+	const [activeInformation, setActiveInformation] = useState({});
 	/**
 	 * モーダルを表示非表示を切り替える関数です。
 	 */
@@ -46,6 +47,20 @@ export default function Notes() {
 			alert("キャンセルしました。");
 		}
 	};
+
+	/**
+	 * アクティブ表示されるinformationを選択する関数です。
+	 * @param e イベントです。
+	 */
+	const handleActiveInformation = (e) => {
+		e.preventDefault();
+		const newActiveInformation = informations.filter(
+			(info) => info.title === e.target.id
+		);
+		console.log(newActiveInformation);
+		setActiveInformation(newActiveInformation[0]);
+	};
+
 	return (
 		<>
 			<Header />
@@ -82,38 +97,75 @@ export default function Notes() {
 						onClick={handleModalToggle}>
 						Noteを追加する
 					</Button>
-					{informations.map((information, index) => (
-						<Button
-							key={information.title}
-							id={information.title}
-							justifyContent={"space-between"}
-							colorScheme={"orange"}
-							h={"50px"}
-							p={"10px"}
-							bg={"orangeAlpha.200"}
-							onClick={() => alert("buttonが押されました")}>
-							{information.title}
+					{informations.map((information, index) => {
+						if (information.title === activeInformation.title) {
+							return (
+								<Button
+									key={information.title}
+									id={information.title}
+									justifyContent={"space-between"}
+									colorScheme={"orange"}
+									h={"50px"}
+									p={"10px"}
+									bg={"orangeAlpha.900"}
+									onClick={(e) => handleActiveInformation(e)}>
+									{information.title}
 
-							<Box
-								w={"35px"}
-								h={"35px"}
-								borderRadius={"5px"}
-								p={"5px"}
-								transition={"ease 0.2s"}
-								_hover={{
-									color: "orangeAlpha.900",
-									bg: "gray.200",
-								}}
-								onClick={(e) => handleDeleteList(e)}>
-								<DeleteIcon
-									alignItems={"center"}
-									justifyItems={"center"}
-									fontSize={"xl"}
-									pointerEvents={"none"}
-								/>
-							</Box>
-						</Button>
-					))}
+									<Box
+										w={"35px"}
+										h={"35px"}
+										borderRadius={"5px"}
+										p={"5px"}
+										transition={"ease 0.2s"}
+										_hover={{
+											color: "orangeAlpha.900",
+											bg: "gray.200",
+										}}
+										onClick={(e) => handleDeleteList(e)}>
+										<DeleteIcon
+											alignItems={"center"}
+											justifyItems={"center"}
+											fontSize={"xl"}
+											pointerEvents={"none"}
+										/>
+									</Box>
+								</Button>
+							);
+						} else {
+							return (
+								<Button
+									key={information.title}
+									id={information.title}
+									justifyContent={"space-between"}
+									colorScheme={"orange"}
+									h={"50px"}
+									p={"10px"}
+									bg={"orangeAlpha.200"}
+									onClick={(e) => handleActiveInformation(e)}>
+									{information.title}
+
+									<Box
+										w={"35px"}
+										h={"35px"}
+										borderRadius={"5px"}
+										p={"5px"}
+										transition={"ease 0.2s"}
+										_hover={{
+											color: "orangeAlpha.900",
+											bg: "gray.200",
+										}}
+										onClick={(e) => handleDeleteList(e)}>
+										<DeleteIcon
+											alignItems={"center"}
+											justifyItems={"center"}
+											fontSize={"xl"}
+											pointerEvents={"none"}
+										/>
+									</Box>
+								</Button>
+							);
+						}
+					})}
 				</Stack>
 				<Stack
 					w={"55%"}
@@ -126,12 +178,10 @@ export default function Notes() {
 					spacing={10}>
 					<Box display={"flex"}>
 						<Checkbox colorScheme='teal' size={"lg"} mr={"15px"}></Checkbox>
-						<Heading as='h1'>こちらがタイトルです。</Heading>
+						<Heading as='h1'>{activeInformation.title}</Heading>
 					</Box>
 					<Box>
-						<p>
-							こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。こちらにテキストが入ります。
-						</p>
+						<p>{activeInformation.description}</p>
 					</Box>
 				</Stack>
 				<Stack
