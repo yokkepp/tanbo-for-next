@@ -4,6 +4,17 @@ import type { StyleFunctionProps } from "@chakra-ui/styled-system";
 
 const theme = extendTheme({
 	colors: {
+		black: {
+			100: "#696969",
+			200: "#5c5c5c",
+			300: "#545454",
+			400: "#4c4c4c",
+			500: "#414141",
+			600: "#3b3b3b",
+			700: "#303030",
+			800: "#262626",
+			900: "#1f1f1f",
+		},
 		orangeAlpha: {
 			100: "RGBA(223,96,19,0.1)",
 			200: "RGBA(223,96,19,0.2)",

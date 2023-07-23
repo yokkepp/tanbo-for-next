@@ -1,6 +1,6 @@
 "use client";
 import Header from "@/components/Header/Header";
-import Modal from "@/components/Modal/Modal";
+import { Modal } from "@/components/Modal/Modal";
 import {
 	List,
 	UnorderedList,
@@ -11,12 +11,51 @@ import {
 	Checkbox,
 	Heading,
 	SimpleGrid,
+	border,
 } from "@chakra-ui/react";
+import { useState, useRef } from "react";
+import { DeleteIcon } from "@chakra-ui/icons";
+
 export default function Notes() {
+	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [informations, setInformations] = useState([
+		{ title: "タイトル", description: "詳細" },
+		{ title: "タイトル2", description: "詳細2" },
+	]);
+
+	/**
+	 * モーダルを表示非表示を切り替える関数です。
+	 */
+	const handleModalToggle = () => {
+		setIsModalOpen(!isModalOpen);
+	};
+
+	/**
+	 * informationsから任意のinformationを削除する関数です。
+	 * @param e イベントです。
+	 */
+	const handleDeleteList = (e) => {
+		e.stopPropagation();
+		if (confirm("本当に削除しますか？")) {
+			const id = e.target.parentElement.id;
+			const newArray = informations.filter(
+				(information) => information.title !== id
+			);
+			setInformations(newArray);
+		} else {
+			alert("キャンセルしました。");
+		}
+	};
 	return (
 		<>
 			<Header />
-			{/* <Modal /> */}
+			{isModalOpen ? (
+				<Modal
+					handleModalToggle={handleModalToggle}
+					informations={informations}
+					setInformations={setInformations}
+				/>
+			) : null}
 			<Box display={"flex"}>
 				<Stack
 					w={"25%"}
@@ -39,39 +78,42 @@ export default function Notes() {
 						_hover={{
 							color: "gray.900",
 							backgroundColor: "orange.500",
-						}}>
+						}}
+						onClick={handleModalToggle}>
 						Noteを追加する
 					</Button>
-					<Button
-						justifyContent={"left"}
-						colorScheme={"orange"}
-						bg={"orangeAlpha.200"}>
-						ボタン
-					</Button>
-					<Button colorScheme={"orange"} bg={"orangeAlpha.200"}>
-						ボタン
-					</Button>
-					<Button colorScheme={"orange"} bg={"orangeAlpha.900"}>
-						ボタン
-					</Button>
-					<Button colorScheme={"orange"} bg={"orangeAlpha.200"}>
-						ボタン
-					</Button>
-					<Button colorScheme={"orange"} bg={"orangeAlpha.200"}>
-						ボタン
-					</Button>
-					<Button colorScheme={"orange"} bg={"orangeAlpha.200"}>
-						ボタン
-					</Button>
-					<Button colorScheme={"orange"} bg={"orangeAlpha.200"}>
-						ボタン
-					</Button>
-					<Button colorScheme={"orange"} bg={"orangeAlpha.200"}>
-						ボタン
-					</Button>
-					<Button colorScheme={"orange"} bg={"orangeAlpha.200"}>
-						ボタン
-					</Button>
+					{informations.map((information, index) => (
+						<Button
+							key={information.title}
+							id={information.title}
+							justifyContent={"space-between"}
+							colorScheme={"orange"}
+							h={"50px"}
+							p={"10px"}
+							bg={"orangeAlpha.200"}
+							onClick={() => alert("buttonが押されました")}>
+							{information.title}
+
+							<Box
+								w={"35px"}
+								h={"35px"}
+								borderRadius={"5px"}
+								p={"5px"}
+								transition={"ease 0.2s"}
+								_hover={{
+									color: "orangeAlpha.900",
+									bg: "gray.200",
+								}}
+								onClick={(e) => handleDeleteList(e)}>
+								<DeleteIcon
+									alignItems={"center"}
+									justifyItems={"center"}
+									fontSize={"xl"}
+									pointerEvents={"none"}
+								/>
+							</Box>
+						</Button>
+					))}
 				</Stack>
 				<Stack
 					w={"55%"}

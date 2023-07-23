@@ -1,6 +1,6 @@
 "use client";
 import { CloseIcon } from "@chakra-ui/icons";
-
+import { useEffect, useRef, useState } from "react";
 import {
 	Box,
 	Button,
@@ -20,7 +20,50 @@ import {
 	Tr,
 } from "@chakra-ui/react";
 
-export default function Modal() {
+export function Modal(props) {
+	const { handleModalToggle, informations, setInformations } = props;
+	const [title, setTitle] = useState("");
+	const [description, setDescription] = useState("");
+
+	const inputEl = useRef(null);
+
+	const focusTitle = () => {
+		inputEl.current.focus();
+	};
+
+	/**
+	 * 件名の変更を感知して、状態を保管する関数です。
+	 * @param e イベントです。
+	 * @function
+	 */
+	const handleChangeTitle = (e) => {
+		setTitle(e.target.value);
+	};
+
+	/**
+	 * 件名の変更を感知して、状態を保管する関数です。
+	 * @param e イベントです。
+	 * @function
+	 */
+	const handleChangeDescription = (e) => {
+		setDescription(e.target.value);
+	};
+
+	/**
+	 * 件名の変更を感知して、状態を保管する関数です。
+	 * @param e イベントです。
+	 * @function
+	 */
+	const handleClickAddInformation = () => {
+		const newInformations = [...informations, { title, description }];
+		setInformations(newInformations);
+		handleModalToggle();
+	};
+
+	useEffect(() => {
+		focusTitle();
+	}, []);
+
 	return (
 		<Box
 			h={"100vh"}
@@ -37,7 +80,7 @@ export default function Modal() {
 				h={"80%"}
 				w={"80%"}
 				p={"20px"}
-				bg={"gray.700"}
+				bg={"black.800"}
 				display={"flex"}
 				borderRadius={"10px"}
 				shadow={"0px 0px 20px 10px"}>
@@ -47,17 +90,28 @@ export default function Modal() {
 						<Text>最終更新日:2023年7月20日</Text>
 					</Box>
 					<Box display={"flex"}>
-						<Checkbox mr={"20px"}></Checkbox>
+						<Checkbox colorScheme='teal' size={"lg"} mr={"20px"}></Checkbox>
 						<Input
 							size={"lg"}
 							variant={"outline"}
 							placeholder='テスト'
 							bg={"gray.600"}
+							value={title}
+							onChange={handleChangeTitle}
+							ref={inputEl}
 						/>
 					</Box>
-					<Textarea w={"100%"} h={"100%"} bg={"gray.600"}></Textarea>
-					<Button h={"100px"} colorScheme='green'>
-						登録
+					<Textarea
+						w={"100%"}
+						h={"100%"}
+						bg={"gray.600"}
+						value={description}
+						onChange={handleChangeDescription}></Textarea>
+					<Button
+						h={"100px"}
+						colorScheme='green'
+						onClick={handleClickAddInformation}>
+						追加する
 					</Button>
 				</Stack>
 				<Stack w={"30%"} p={"20px"}>
@@ -73,31 +127,31 @@ export default function Modal() {
 								<Tr>
 									<Td>完了or未完了</Td>
 									<Td p={0} borderColor={"transparent"}>
-										<Input value={""} />
+										<Input />
 									</Td>
 								</Tr>
 								<Tr>
 									<Td>完了日</Td>
 									<Td p={0} borderColor={"transparent"}>
-										<Input value={""} />
+										<Input />
 									</Td>
 								</Tr>
 								<Tr>
 									<Td>期限</Td>
 									<Td p={0} borderColor={"transparent"}>
-										<Input value={""} />
+										<Input />
 									</Td>
 								</Tr>
 								<Tr>
 									<Td>予定開始日</Td>
 									<Td p={0} borderColor={"transparent"}>
-										<Input value={""} />
+										<Input />
 									</Td>
 								</Tr>
 								<Tr>
 									<Td>予定終了日</Td>
 									<Td p={0} borderColor={"transparent"}>
-										<Input value={""} />
+										<Input />
 									</Td>
 								</Tr>
 							</Tbody>
@@ -105,7 +159,6 @@ export default function Modal() {
 					</TableContainer>
 				</Stack>
 			</Box>
-			<Box></Box>
 			<CloseIcon
 				w={12}
 				h={12}
@@ -114,6 +167,7 @@ export default function Modal() {
 				top={"40px"}
 				right={"40px"}
 				cursor={"pointer"}
+				onClick={handleModalToggle}
 			/>
 		</Box>
 	);

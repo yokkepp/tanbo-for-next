@@ -13,32 +13,35 @@ import {
 	Button,
 	Center,
 } from "@chakra-ui/react";
+import { useCallback, useEffect, useState } from "react";
+import { color } from "framer-motion";
+import { useRouter } from "next/router";
 
 export default function Header() {
 	const menus = [
 		{
-			name: "Inbox",
-			link: "/inbox",
-			bgColor: "gray",
-			borderColor: "border-gray-500",
+			name: "Home",
+			link: "/",
+			colorScheme: "gray",
+			bgColor: "gray.500",
 		},
 		{
 			name: "Tasks",
 			link: "/tasks",
-			bgColor: "teal",
-			borderColor: "border-teal-600",
+			colorScheme: "teal",
+			bgColor: "tealAlpha.900",
 		},
 		{
 			name: "Notes",
 			link: "/notes",
-			bgColor: "orange",
-			borderColor: "border-orange-700",
+			colorScheme: "orange",
+			bgColor: "orangeAlpha.900",
 		},
 		{
 			name: "Boards",
 			link: "/boards",
-			bgColor: "blue",
-			borderColor: "border-sky-600",
+			colorScheme: "blue",
+			bgColor: "blueAlpha.900",
 		},
 	];
 
@@ -58,14 +61,30 @@ export default function Header() {
 				<Text mr={50}>TaNBo</Text>
 				{/* TODO: ロゴを画像に差し替える */}
 				<Box display={"flex"}>
-					{menus.map((menu) => (
-						// TODO: 押下できる範囲を広げたいたいめ、Linkコンポーネントとliタグを逆にした挙動が望ましいが、エラーが出るので要検討。
-						<Link href={menu.link} key={menu.name}>
-							<Button colorScheme={menu.bgColor} m={"5px"}>
-								{menu.name}
-							</Button>
-						</Link>
-					))}
+					{menus.map((menu) => {
+						// TODO: 現在のパスを取得し、色を特定する。
+						if ("/note" === menu.link) {
+							return (
+								<Link href={menu.link} key={menu.name}>
+									<Button m={"5px"} bg={menu.bgColor}>
+										{menu.name}
+									</Button>
+								</Link>
+							);
+						} else {
+							return (
+								<Link href={menu.link} key={menu.name}>
+									<Button
+										m={"5px"}
+										bg={"none"}
+										color={menu.bgColor}
+										_hover={{ bg: menu.bgColor, color: "gray.200" }}>
+										{menu.name}
+									</Button>
+								</Link>
+							);
+						}
+					})}
 				</Box>
 			</Box>
 			<Button colorScheme={"Black"}>ログアウト</Button>
