@@ -4,7 +4,7 @@ import { Modal } from "@/components/Modal/Modal";
 import {
 	List,
 	UnorderedList,
-	Textarea,
+	Text,
 	Box,
 	Stack,
 	Button,
@@ -12,17 +12,26 @@ import {
 	Heading,
 	SimpleGrid,
 	border,
+	Input,
 } from "@chakra-ui/react";
 import { useState, useRef } from "react";
 import { DeleteIcon } from "@chakra-ui/icons";
 
 export default function Notes() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [title, setTitle] = useState("");
 	const [informations, setInformations] = useState([
 		{ title: "タイトル1", description: "詳細1" },
 		{ title: "タイトル2", description: "詳細2" },
 		{ title: "タイトル3", description: "詳細3" },
 	]);
+	const [isEditing, setIsEditing] = useState({
+		title: false,
+		description: false,
+	});
+	const handleChangeTitle = (e) => {
+		setTitle((title) => e.target.value);
+	};
 	const [activeInformation, setActiveInformation] = useState({});
 	/**
 	 * モーダルを表示非表示を切り替える関数です。
@@ -43,9 +52,26 @@ export default function Notes() {
 				(information) => information.title !== id
 			);
 			setInformations(newArray);
+			setActiveInformation({});
 		} else {
 			alert("キャンセルしました。");
 		}
+	};
+
+	/**
+	 * クリックした要素だけを編集中のStateに変更する関数です。
+	 * @param e イベントです。
+	 */
+	const handleIsEditing = (e) => {
+		//全てのプロパティの値をfalseにする
+		const newObj = { ...isEditing };
+		for (let property in newObj) {
+			newObj[property] = false;
+		}
+
+		//該当のプロパティのみtrueにする。
+		setIsEditing({ ...newObj, [e.target.id]: true });
+		console.log(isEditing);
 	};
 
 	/**
@@ -60,6 +86,17 @@ export default function Notes() {
 		console.log(newActiveInformation);
 		setActiveInformation(newActiveInformation[0]);
 	};
+
+	const [tasks, setTasks] = useState({ finish: "", limit: "" });
+
+	tasks;
+
+	/**
+	 * クリックされた要素を編集する関数です。
+	 */
+	// const handleUpdateInformation = (e, el) => {
+	// 	const;
+	// };
 
 	return (
 		<>
@@ -178,10 +215,28 @@ export default function Notes() {
 					spacing={10}>
 					<Box display={"flex"}>
 						<Checkbox colorScheme='teal' size={"lg"} mr={"15px"}></Checkbox>
-						<Heading as='h1'>{activeInformation.title}</Heading>
+						{isEditing.title ? (
+							<Input
+								id='title'
+								fontSize='3xl'
+								fontWeight={"bold"}
+								onClick={(e) => handleIsEditing(e)}
+								onChange={(e) => handleChangeTitle(e)}
+								value={activeInformation.title}></Input>
+						) : (
+							<Text
+								id='title'
+								fontSize='3xl'
+								fontWeight={"bold"}
+								onClick={(e) => handleIsEditing(e)}>
+								{activeInformation.title}
+							</Text>
+						)}
 					</Box>
-					<Box>
-						<p>{activeInformation.description}</p>
+					<Box whiteSpace={"pre-wrap"}>
+						<p id='description' onClick={(e) => handleIsEditing(e)}>
+							{activeInformation.description}
+						</p>
 					</Box>
 				</Stack>
 				<Stack
