@@ -59,4 +59,6 @@ const theme = extendTheme({
 	},
 });
 
+export const themeObjWatch = console.log(theme.components.Input);
+
 export default theme;
