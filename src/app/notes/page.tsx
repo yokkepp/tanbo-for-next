@@ -195,8 +195,17 @@ export default function Notes() {
 		//firebaseの更新をする。
 		const updateRef = await doc(db, "informations", activeNote.id);
 
-		//updateするときは、idは不要なので、削除したものをupdateする
 		const updateInformation = { ...activeNote };
+		//idを削除する前に、informationsも更新してローカルを最新状態にする。
+		const newInformations = informations.map((info) => {
+			if (info.id === activeNote.id) {
+				return activeNote;
+			} else {
+				return info;
+			}
+		});
+		setInformations(newInformations);
+		//updateするときは、idは不要なので、削除したものをupdateする
 		delete updateInformation.id;
 
 		console.log(updateInformation);
@@ -294,7 +303,7 @@ export default function Notes() {
 										pointerEvents={"none"}
 										w={"100%"}
 										textAlign={"left"}>
-										{info.title}
+										{activeNote.title}
 									</Box>
 
 									<Box
