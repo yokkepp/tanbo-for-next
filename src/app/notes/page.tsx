@@ -15,11 +15,20 @@ import {
 	Input,
 	Textarea,
 } from "@chakra-ui/react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { DeleteIcon } from "@chakra-ui/icons";
 import { CommonInformation } from "../types";
 import { BgMaskForInput } from "@/components/bgMaskForInput";
-import { themeObjWatch } from "../theme";
+import { db } from "../firebase";
+
+import {
+	collection,
+	deleteDoc,
+	doc,
+	getDocs,
+	updateDoc,
+} from "firebase/firestore";
+import { resolve } from "path";
 
 //あらかじめ設定するNoteデータ
 const INITIAL_DATA = [
@@ -65,7 +74,7 @@ const INITIAL_DATA = [
 ];
 
 //全てのプロパティの値をfalseにする
-const initialEditing = {
+const INITIAL_EDITING = {
 	title: false,
 	description: false,
 	completedAt: false,
@@ -85,15 +94,10 @@ export default function Notes() {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	//どの要素が編集中かをオブジェクトで保持するState。
-	const [isEditing, setIsEditing] = useState(initialEditing);
+	const [isEditing, setIsEditing] = useState(INITIAL_EDITING);
 
-	//編集中のidとvalueを管理します。
-	const [editingElement, setEditingElement] = useState({
-		id: "",
-		value: "",
-	});
-	//Noteの全データを管理します。
-	const [informations, setInformations] = useState(INITIAL_DATA);
+	//編集中のプロパティ名を管理します。（title, descriptionなど）
+	const [editingElement, setEditingElement] = useState("");
 
 	//Tasksコンポーネントの状態を管理します。
 	const [tasksState, setTasksState] = useState({
@@ -116,23 +120,34 @@ export default function Notes() {
 	//表示されるNoteを管理します。
 	const [activeNote, setActiveNote] = useState({});
 
-	const handleClickUpdateElement = (e) => {
+	//Noteの全データを管理します。
+	const [informations, setInformations] = useState([]);
+
+	//レンダリング時にfirebaseからデータを読み込む。
+	useEffect(() => {
+		const getDataForfirestore = async () => {
+			const querySnapshot = await getDocs(collection(db, "informations"));
+			const INITIAL_DATA_FOR_FIRESTORE = await [];
+			querySnapshot.forEach((doc) => {
+				INITIAL_DATA_FOR_FIRESTORE.push({ ...doc.data(), id: doc.id });
+			});
+			setInformations(INITIAL_DATA_FOR_FIRESTORE);
+		};
+		getDataForfirestore();
+	}, []);
+	//TODO: 削除を実行した後に、firebaseを再度読み込む必要がある！useEffect？
+
+	/**
+	 *
+	 * @param e
+	 */
+	const handleClickUpdateElement = async (e) => {
+		setEditingElement(e.target.id);
 		//クリックされた要素だけを編集中のステータスに変更する
-		const newEditing = { ...initialEditing };
+		const newEditing = { ...INITIAL_EDITING };
 		setIsEditing({ ...newEditing, [e.target.id]: true, all: true });
 
-		//編集中の値を一時的に保持する
-		setEditingElement({
-			id: e.target.id,
-			value: e.target.innerText,
-		});
-	};
-
-	const handleChangeEditingElementValue = (e) => {
-		setEditingElement({
-			...editingElement,
-			value: e.target.value,
-		});
+		console.log(newEditing);
 		console.log(editingElement);
 	};
 
@@ -152,10 +167,11 @@ export default function Notes() {
 		if (confirm("本当に削除しますか？")) {
 			const id = e.target.parentElement.id;
 			const newArray = informations.filter(
-				(information) => information.title !== id
+				(information) => information.id !== id
 			);
 			setInformations(newArray);
 			setActiveNote({});
+			deleteDoc(doc(db, "informations", id));
 		} else {
 			alert("キャンセルしました。");
 		}
@@ -164,18 +180,30 @@ export default function Notes() {
 	/**
 	 * 編集中以外の要素を押下することで、isEditingを初期化し、値を更新する関数です。
 	 */
-	const endEdit = () => {
-		const newInformations = informations.map((info) => {
-			if (info.title === editingElement.id) {
-				return { [editingElement.id]: editingElement.value };
-			} else {
-				return info;
-			}
-		});
-		setInformations(newInformations);
-		setIsEditing(initialEditing);
+	const updateSubmit = async () => {
+		// const newInformations = informations.map((info) => {
+		// 	if (info.title === editingElement.id) {
+		// 		return { [editingElement.id]: editingElement.value };
+		// 	} else {
+		// 		return info;
+		// 	}
+		// });
+		// setInformations(newInformations);
+		// setIsEditing(initialEditing);
 		//編集中の要素を把握し、更新する
 
+		//firebaseの更新をする。
+		const updateRef = await doc(db, "informations", activeNote.id);
+
+		//updateするときは、idは不要なので、削除したものをupdateする
+		const updateInformation = { ...activeNote };
+		delete updateInformation.id;
+
+		console.log(updateInformation);
+		await updateDoc(updateRef, updateInformation);
+
+		//編集状態を初期化して解除する
+		setIsEditing(INITIAL_EDITING);
 		console.log("clicked!");
 	};
 
@@ -185,12 +213,14 @@ export default function Notes() {
 	 */
 	const handleActiveNote = (e) => {
 		e.preventDefault();
+		console.log(e);
 		const newActiveNote = informations.filter(
-			(info) => info.title === e.target.id
+			(info) => info.id === e.target.id
 		);
-		console.log(newActiveNote);
+		console.log({ newActiveNote });
 		setActiveNote(newActiveNote[0]);
 	};
+	//TODO: UIにてNoteを追加されたものをクリックすると、エラーが出る。informationsに反映されてないことが原因か？？
 
 	/**
 	 * クリックされた要素を編集する関数です。
@@ -203,10 +233,10 @@ export default function Notes() {
 	 *@param e イベントです。
 	 */
 	const handleChangeEditingValue = (e: any) => {
-		setEditingElement({
-			id: e.target.id,
-			value: e.target.value,
-		});
+		//setActiveNoteに、現在の値を展開して、上書きしていく
+		const newActiveNote = { ...activeNote, [editingElement]: e.target.value };
+
+		setActiveNote(newActiveNote);
 	};
 
 	return (
@@ -219,7 +249,7 @@ export default function Notes() {
 					setInformations={setInformations}
 				/>
 			) : null}
-			{isEditing.all ? <BgMaskForInput endEdit={endEdit} /> : null}
+			{isEditing.all ? <BgMaskForInput updateSubmit={updateSubmit} /> : null}
 			<Box display={"flex"}>
 				<Stack
 					w={"25%"}
@@ -246,19 +276,26 @@ export default function Notes() {
 						onClick={handleModalToggle}>
 						Noteを追加する
 					</Button>
-					{informations.map((information) => {
-						if (information.title === activeNote.title) {
+					{informations.map((info) => {
+						if (info.id === activeNote.id) {
 							return (
 								<Button
-									key={information.title}
-									id={information.title}
+									key={info.id}
+									id={info.id}
 									justifyContent={"space-between"}
 									colorScheme={"orange"}
 									h={"50px"}
 									p={"10px"}
 									bg={"orangeAlpha.900"}
-									onClick={(e) => handleActiveInformation(e)}>
-									{information.title}
+									onClick={(e) => handleActiveNote(e)}>
+									<Box
+										overflow={"hidden"}
+										textOverflow={"ellipsis"}
+										pointerEvents={"none"}
+										w={"100%"}
+										textAlign={"left"}>
+										{info.title}
+									</Box>
 
 									<Box
 										w={"35px"}
@@ -283,15 +320,22 @@ export default function Notes() {
 						} else {
 							return (
 								<Button
-									key={information.title}
-									id={information.title}
+									key={info.id}
+									id={info.id}
 									justifyContent={"space-between"}
 									colorScheme={"orange"}
 									h={"50px"}
 									p={"10px"}
 									bg={"orangeAlpha.200"}
 									onClick={(e) => handleActiveNote(e)}>
-									{information.title}
+									<Box
+										overflow={"hidden"}
+										textOverflow={"ellipsis"}
+										pointerEvents={"none"}
+										w={"100%"}
+										textAlign={"left"}>
+										{info.title}
+									</Box>
 
 									<Box
 										w={"35px"}
@@ -328,18 +372,16 @@ export default function Notes() {
 					<Box display={"flex"}>
 						<Checkbox colorScheme='teal' size={"lg"} mr={"15px"}></Checkbox>
 						{isEditing.title ? (
-							<>
-								<Input
-									id='title'
-									fontSize='3xl'
-									fontWeight={"bold"}
-									border={"none"}
-									onChange={(e) => handleChangeEditingElementValue(e)}
-									value={editingElement.value}
-									position={"relative"}
-									zIndex={"popover"}
-								/>
-							</>
+							<Input
+								id='title'
+								fontSize='3xl'
+								fontWeight={"bold"}
+								border={"none"}
+								value={activeNote.title}
+								position={"relative"}
+								onChange={(e) => handleChangeEditingValue(e)}
+								zIndex={"popover"}
+							/>
 						) : (
 							<Text
 								id='title'

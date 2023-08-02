@@ -19,7 +19,8 @@ import {
 	Th,
 	Tr,
 } from "@chakra-ui/react";
-
+import { db } from "@/app/firebase";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 export function Modal(props) {
 	const { handleModalToggle, informations, setInformations } = props;
 	const [title, setTitle] = useState("");
@@ -54,9 +55,20 @@ export function Modal(props) {
 	 * @param e イベントです。
 	 * @function
 	 */
-	const handleClickAddInformation = () => {
-		const newInformations = [...informations, { title, description }];
+	const handleClickAddInformation = async () => {
+		//firebaseに追加する
+		const docRef = await addDoc(collection(db, "informations"), {
+			title,
+			description,
+		});
+
+		const newInformations = [
+			...informations,
+			{ title, description, id: docRef.id },
+		];
+
 		setInformations(newInformations);
+
 		handleModalToggle();
 	};
 

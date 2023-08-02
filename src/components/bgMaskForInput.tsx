@@ -2,10 +2,10 @@ import { Box } from "@chakra-ui/react";
 
 /**
  * 編集時の編集中以外の要素にマスクをかけるためのコンポーネントです。
- * @param endEdit endEdit関数を渡します。
+ * @param updateSubmit
  * @returns エレメントが返ります。
  */
-export const BgMaskForInput = ({ endEdit }) => {
+export const BgMaskForInput = ({ updateSubmit }) => {
 	return (
 		<Box
 			w={"100vw"}
@@ -15,6 +15,6 @@ export const BgMaskForInput = ({ endEdit }) => {
 			position={"absolute"}
 			zIndex={"overlay"}
 			bg={"blackAlpha.500"}
-			onClick={endEdit}></Box>
+			onClick={updateSubmit}></Box>
 	);
 };
