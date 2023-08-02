@@ -21,8 +21,11 @@ import {
 } from "@chakra-ui/react";
 import { db } from "@/app/firebase";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import Tasks from "../TasksParts";
+import NotesParts from "../NotesParts";
+import BoardsParts from "../BoardsParts";
 export function Modal(props) {
-	const { handleModalToggle, informations, setInformations } = props;
+	const { handleModalToggle, informations, setInformations, isEditing } = props;
 	const [title, setTitle] = useState("");
 	const [description, setDescription] = useState("");
 
@@ -92,11 +95,11 @@ export function Modal(props) {
 				h={"80%"}
 				w={"80%"}
 				p={"20px"}
-				bg={"black.800"}
+				bg={"gray.800"}
 				display={"flex"}
 				borderRadius={"10px"}
-				shadow={"0px 0px 20px 10px"}>
-				<Stack spacing={7} w={"70%"} p={"20px"} textColor={"gray.300"}>
+				shadow={"10px 10px 10px 0px black"}>
+				<Stack spacing={6} w={"70%"} p={"20px"} textColor={"gray.300"}>
 					<Box display={"flex"} justifyContent={"space-between"}>
 						<Text>作成日:2023年7月20日</Text>
 						<Text>最終更新日:2023年7月20日</Text>
@@ -107,7 +110,8 @@ export function Modal(props) {
 							size={"lg"}
 							variant={"outline"}
 							placeholder='テスト'
-							bg={"gray.600"}
+							bg={"gray.700"}
+							border={"none"}
 							value={title}
 							onChange={handleChangeTitle}
 							ref={inputEl}
@@ -116,8 +120,9 @@ export function Modal(props) {
 					<Textarea
 						w={"100%"}
 						h={"100%"}
-						bg={"gray.600"}
+						bg={"gray.700"}
 						value={description}
+						border={"none"}
 						onChange={handleChangeDescription}></Textarea>
 					<Button
 						h={"100px"}
@@ -126,55 +131,16 @@ export function Modal(props) {
 						追加する
 					</Button>
 				</Stack>
-				<Stack w={"30%"} p={"20px"}>
-					<TableContainer>
-						<Table variant={"unstyled"} size={"sm"} textColor={"gray.200"}>
-							<Thead bg={"green"}>
-								<Tr>
-									<Th textColor={"white"}>Tasks</Th>
-									<Th></Th>
-								</Tr>
-							</Thead>
-							<Tbody>
-								<Tr>
-									<Td>完了or未完了</Td>
-									<Td p={0} borderColor={"transparent"}>
-										<Input />
-									</Td>
-								</Tr>
-								<Tr>
-									<Td>完了日</Td>
-									<Td p={0} borderColor={"transparent"}>
-										<Input />
-									</Td>
-								</Tr>
-								<Tr>
-									<Td>期限</Td>
-									<Td p={0} borderColor={"transparent"}>
-										<Input />
-									</Td>
-								</Tr>
-								<Tr>
-									<Td>予定開始日</Td>
-									<Td p={0} borderColor={"transparent"}>
-										<Input />
-									</Td>
-								</Tr>
-								<Tr>
-									<Td>予定終了日</Td>
-									<Td p={0} borderColor={"transparent"}>
-										<Input />
-									</Td>
-								</Tr>
-							</Tbody>
-						</Table>
-					</TableContainer>
+				<Stack spacing={6} w={"30%"} p={"20px"} textColor={"white"}>
+					<Tasks isEditing={isEditing} />
+					<NotesParts />
+					<BoardsParts />
 				</Stack>
 			</Box>
 			<CloseIcon
-				w={12}
-				h={12}
-				color='gray.500'
+				w={10}
+				h={10}
+				color='gray.600'
 				position={"absolute"}
 				top={"40px"}
 				right={"40px"}

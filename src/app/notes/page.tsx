@@ -1,6 +1,10 @@
 "use client";
 import Header from "@/components/Header/Header";
 import { Modal } from "@/components/Modal/Modal";
+import TasksParts from "@/components/TasksParts";
+import NotesParts from "@/components/NotesParts";
+import BoardsParts from "@/components/BoardsParts";
+
 import {
 	List,
 	UnorderedList,
@@ -256,6 +260,7 @@ export default function Notes() {
 					handleModalToggle={handleModalToggle}
 					informations={informations}
 					setInformations={setInformations}
+					isEditing={isEditing}
 				/>
 			) : null}
 			{isEditing.all ? <BgMaskForInput updateSubmit={updateSubmit} /> : null}
@@ -437,213 +442,9 @@ export default function Notes() {
 							<p>最終更新日：</p>
 							<p>2023/4/10 23:54</p>
 						</SimpleGrid>
-						<Box>
-							<Box
-								bg={"tealAlpha.900"}
-								w={"100%"}
-								border={"solid"}
-								borderColor={"tealAlpha.900"}
-								textAlign={"center"}
-								fontWeight={"bold"}
-								roundedTop={"5px"}
-								color={"gray.900"}>
-								Tasks
-							</Box>
-							<SimpleGrid
-								columns={2}
-								borderColor={"gray.700"}
-								borderTopColor={"tealAlpha.900"}>
-								<Box
-									p={"10px"}
-									borderBottom={"solid"}
-									borderLeft={"solid"}
-									borderColor={"gray.700"}>
-									完了日：
-								</Box>
-								<Box
-									id='completedAt'
-									p={"10px"}
-									borderBottom={"solid"}
-									borderRight={"solid"}
-									borderColor={"gray.700"}></Box>
-								<Box
-									p={"10px"}
-									borderBottom={"solid"}
-									borderLeft={"solid"}
-									borderColor={"gray.700"}>
-									期限：
-								</Box>
-								{isEditing.timeLimit ? (
-									<>
-										<Input
-											id='timeLimit'
-											type='datetime-local'
-											p={"10px"}
-											border={"none"}
-											_hover={{ border: "none" }}
-											shadow={"none"}
-											borderBottom={"solid"}
-											borderRight={"solid"}
-											borderColor={"gray.700"}
-											position={"relative"}
-											zIndex={"popover"}
-										/>
-									</>
-								) : (
-									<Box
-										id='timeLimit'
-										p={"10px"}
-										borderBottom={"solid"}
-										borderRight={"solid"}
-										borderColor={"gray.700"}>
-										2023/5/15 23:00
-									</Box>
-								)}
-
-								<Box
-									p={"10px"}
-									borderBottom={"solid"}
-									borderLeft={"solid"}
-									borderColor={"gray.700"}>
-									開始予定：
-								</Box>
-								<Box
-									id='planStart'
-									p={"10px"}
-									borderBottom={"solid"}
-									borderRight={"solid"}
-									borderColor={"gray.700"}>
-									2023/5/15 23:00
-								</Box>
-								<Box
-									p={"10px"}
-									borderBottom={"solid"}
-									borderLeft={"solid"}
-									borderColor={"gray.700"}>
-									終了予定：
-								</Box>
-								<Box
-									id='planEnd'
-									p={"10px"}
-									borderBottom={"solid"}
-									borderRight={"solid"}
-									borderColor={"gray.700"}></Box>
-								<Box
-									p={"10px"}
-									borderBottomLeftRadius={"5px"}
-									borderBottom={"solid"}
-									borderLeft={"solid"}
-									borderColor={"gray.700"}>
-									進捗：
-								</Box>
-								<Box
-									id='progress'
-									p={"10px"}
-									borderBottomRightRadius={"5px"}
-									borderBottom={"solid"}
-									borderRight={"solid"}
-									borderColor={"gray.700"}>
-									10％
-								</Box>
-							</SimpleGrid>
-						</Box>
-						<Box>
-							<Box
-								bg={"orangeAlpha.900"}
-								w={"100%"}
-								border={"solid"}
-								borderColor={"orangeAlpha.900"}
-								textAlign={"center"}
-								fontWeight={"bold"}
-								roundedTop={"5px"}
-								color={"gray.900"}>
-								Notes
-							</Box>
-							<SimpleGrid
-								columns={2}
-								borderColor={"gray.700"}
-								borderTopColor={"tealAlpha.900"}>
-								<Box
-									p={"10px"}
-									borderBottomLeftRadius={"5px"}
-									borderBottom={"solid"}
-									borderLeft={"solid"}
-									borderColor={"gray.700"}>
-									Task完了後：
-								</Box>
-								<Box
-									id='notesArchive'
-									p={"10px"}
-									borderBottomRightRadius={"5px"}
-									borderBottom={"solid"}
-									borderRight={"solid"}
-									borderColor={"gray.700"}>
-									残す
-								</Box>
-							</SimpleGrid>
-						</Box>
-						<Box>
-							<Box
-								bg={"blueAlpha.900"}
-								w={"100%"}
-								border={"solid"}
-								borderColor={"blueAlpha.900"}
-								textAlign={"center"}
-								fontWeight={"bold"}
-								roundedTop={"5px"}
-								color={"gray.900"}>
-								Boards
-							</Box>
-							<SimpleGrid columns={2} borderColor={"gray.700"}>
-								<Box
-									p={"10px"}
-									borderBottom={"solid"}
-									borderLeft={"solid"}
-									borderColor={"gray.700"}>
-									ボード名：
-								</Box>
-								<Box
-									id='boardName'
-									p={"10px"}
-									borderBottom={"solid"}
-									borderRight={"solid"}
-									borderColor={"gray.700"}>
-									xxxプロジェクト
-								</Box>
-								<Box
-									id='boardStatus'
-									p={"10px"}
-									borderBottom={"solid"}
-									borderLeft={"solid"}
-									borderColor={"gray.700"}>
-									ステータス：
-								</Box>
-								<Box
-									p={"10px"}
-									borderBottom={"solid"}
-									borderRight={"solid"}
-									borderColor={"gray.700"}>
-									確認中
-								</Box>
-								<Box
-									id='boardsArchive'
-									p={"10px"}
-									borderBottomLeftRadius={"5px"}
-									borderBottom={"solid"}
-									borderLeft={"solid"}
-									borderColor={"gray.700"}>
-									Task完了後：
-								</Box>
-								<Box
-									p={"10px"}
-									borderBottomRightRadius={"5px"}
-									borderBottom={"solid"}
-									borderRight={"solid"}
-									borderColor={"gray.700"}>
-									アーカイブ
-								</Box>
-							</SimpleGrid>
-						</Box>
+						<TasksParts isEditing={isEditing} />
+						<NotesParts />
+						<BoardsParts />
 					</Stack>
 				</Stack>
 			</Box>
