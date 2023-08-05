@@ -21,7 +21,7 @@ import {
 } from "@chakra-ui/react";
 import { useState, useRef, useEffect } from "react";
 import { DeleteIcon } from "@chakra-ui/icons";
-import { CommonInformation } from "../types";
+import { Informations } from "../types";
 import { BgMaskForInput } from "@/components/bgMaskForInput";
 import { db } from "../firebase";
 
@@ -33,6 +33,7 @@ import {
 	updateDoc,
 } from "firebase/firestore";
 import { resolve } from "path";
+import { NullLiteral } from "typescript";
 
 //あらかじめ設定するNoteデータ
 const INITIAL_DATA = [
@@ -131,7 +132,7 @@ export default function Notes() {
 	useEffect(() => {
 		const getDataForfirestore = async () => {
 			const querySnapshot = await getDocs(collection(db, "informations"));
-			const INITIAL_DATA_FOR_FIRESTORE = await [];
+			const INITIAL_DATA_FOR_FIRESTORE = [];
 			querySnapshot.forEach((doc) => {
 				INITIAL_DATA_FOR_FIRESTORE.push({ ...doc.data(), id: doc.id });
 			});
@@ -139,20 +140,18 @@ export default function Notes() {
 		};
 		getDataForfirestore();
 	}, []);
-	//TODO: 削除を実行した後に、firebaseを再度読み込む必要がある！useEffect？
+	//TODO: 通信環境によって、取得できない時がある。失敗時と成功時の処理を各必要がありそう？
 
 	/**
-	 *
-	 * @param e
+	 *クリックされた要素だけを編集中のステータスに変更するための関数です。
+	 * @param e イベントです。
 	 */
 	const handleClickUpdateElement = async (e) => {
+		//対象のidに設定されたプロパティ名を取得する。
 		setEditingElement(e.target.id);
-		//クリックされた要素だけを編集中のステータスに変更する
+		//一度初期化し、クリックされた要素だけを編集中のステータスに変更する
 		const newEditing = { ...INITIAL_EDITING };
 		setIsEditing({ ...newEditing, [e.target.id]: true, all: true });
-
-		console.log(newEditing);
-		console.log(editingElement);
 	};
 
 	/**
@@ -185,17 +184,6 @@ export default function Notes() {
 	 * 編集中以外の要素を押下することで、isEditingを初期化し、値を更新する関数です。
 	 */
 	const updateSubmit = async () => {
-		// const newInformations = informations.map((info) => {
-		// 	if (info.title === editingElement.id) {
-		// 		return { [editingElement.id]: editingElement.value };
-		// 	} else {
-		// 		return info;
-		// 	}
-		// });
-		// setInformations(newInformations);
-		// setIsEditing(initialEditing);
-		//編集中の要素を把握し、更新する
-
 		//firebaseの更新をする。
 		const updateRef = await doc(db, "informations", activeNote.id);
 
@@ -251,6 +239,10 @@ export default function Notes() {
 
 		setActiveNote(newActiveNote);
 	};
+
+	useEffect(() => {
+		console.log(activeNote);
+	}, [activeNote]);
 
 	return (
 		<>
@@ -383,48 +375,63 @@ export default function Notes() {
 					px={"20px"}
 					color={"gray.300"}
 					spacing={10}>
-					<Box display={"flex"}>
-						<Checkbox colorScheme='teal' size={"lg"} mr={"15px"}></Checkbox>
-						{isEditing.title ? (
-							<Input
-								id='title'
-								fontSize='3xl'
-								fontWeight={"bold"}
-								border={"none"}
-								value={activeNote.title}
-								position={"relative"}
-								onChange={(e) => handleChangeEditingValue(e)}
-								zIndex={"popover"}
-							/>
-						) : (
-							<Text
-								id='title'
-								fontSize='3xl'
-								fontWeight={"bold"}
-								display={"block"}
-								w={"100%"}
-								onClick={(e) => handleClickUpdateElement(e)}>
-								{activeNote.title}
-							</Text>
-						)}
-					</Box>
-					<Box whiteSpace={"pre-wrap"}>
-						{isEditing.description ? (
-							<>
-								<Textarea
-									id='description'
-									w={"100%"}
-									h={"calc(100vh - 200px)"}
-									resize={"none"}
-									position={"relative"}
-									zIndex={"popover"}
-									value={""}
-								/>
-							</>
-						) : (
-							<p id='description'>{activeNote.description}</p>
-						)}
-					</Box>
+					{Object.keys(activeNote).length ? (
+						<>
+							<Box display={"flex"}>
+								<Checkbox colorScheme='teal' size={"lg"} mr={"15px"}></Checkbox>
+								{isEditing.title ? (
+									<Input
+										id='title'
+										fontSize='3xl'
+										fontWeight={"bold"}
+										border={"none"}
+										value={activeNote.title}
+										position={"relative"}
+										onChange={(e) => handleChangeEditingValue(e)}
+										zIndex={"popover"}
+									/>
+								) : (
+									<Text
+										id='title'
+										fontSize='3xl'
+										fontWeight={"bold"}
+										display={"block"}
+										w={"100%"}
+										onClick={(e) => handleClickUpdateElement(e)}>
+										{activeNote.title}
+									</Text>
+								)}
+							</Box>
+							<Box whiteSpace={"pre-wrap"}>
+								{isEditing.description ? (
+									<Textarea
+										id='description'
+										w={"100%"}
+										h={"calc(100vh - 200px)"}
+										resize={"none"}
+										position={"relative"}
+										zIndex={"popover"}
+										onChange={(e) => handleChangeEditingValue(e)}
+										value={activeNote.description}
+									/>
+								) : (
+									<Text
+										id='description'
+										onClick={(e) => handleClickUpdateElement(e)}>
+										{activeNote.description}
+									</Text>
+								)}
+							</Box>
+						</>
+					) : (
+						<Box
+							display={"flex"}
+							h={"100vh"}
+							justifyContent={"center"}
+							alignItems={"center"}>
+							<Text>Noteが選択されていません。</Text>
+						</Box>
+					)}
 				</Stack>
 				<Stack
 					w={"20%"}
@@ -442,7 +449,12 @@ export default function Notes() {
 							<p>最終更新日：</p>
 							<p>2023/4/10 23:54</p>
 						</SimpleGrid>
-						<TasksParts isEditing={isEditing} />
+						<TasksParts
+							isEditing={isEditing}
+							activeNote={activeNote}
+							handleChangeEditingValue={handleChangeEditingValue}
+							handleClickUpdateElement={handleClickUpdateElement}
+						/>
 						<NotesParts />
 						<BoardsParts />
 					</Stack>

@@ -1,6 +1,11 @@
-import { Box, SimpleGrid, Input } from "@chakra-ui/react";
+import { Box, SimpleGrid, Input, Text } from "@chakra-ui/react";
 export default function TasksParts(props) {
-	const { isEditing } = props;
+	const {
+		isEditing,
+		activeNote,
+		handleChangeEditingValue,
+		handleClickUpdateElement,
+	} = props;
 	return (
 		<Box>
 			<Box
@@ -39,30 +44,32 @@ export default function TasksParts(props) {
 					期限：
 				</Box>
 				{isEditing.timeLimit ? (
-					<>
-						<Input
-							id='timeLimit'
-							type='datetime-local'
-							p={"10px"}
-							border={"none"}
-							_hover={{ border: "none" }}
-							shadow={"none"}
-							borderBottom={"solid"}
-							borderRight={"solid"}
-							borderColor={"gray.700"}
-							position={"relative"}
-							zIndex={"popover"}
-						/>
-					</>
+					<Input
+						id='timeLimit'
+						type='datetime-local'
+						p={"10px"}
+						border={"none"}
+						_hover={{ border: "none" }}
+						shadow={"none"}
+						borderBottom={"solid"}
+						borderRight={"solid"}
+						borderColor={"gray.700"}
+						position={"relative"}
+						zIndex={"popover"}
+						placeholder='w'
+						onChange={(e) => handleChangeEditingValue(e)}
+						value={activeNote.timeLimit}
+					/>
 				) : (
-					<Box
+					<Text
 						id='timeLimit'
 						p={"10px"}
 						borderBottom={"solid"}
 						borderRight={"solid"}
-						borderColor={"gray.700"}>
-						2023/5/15 23:00
-					</Box>
+						borderColor={"gray.700"}
+						onClick={(e) => handleClickUpdateElement(e)}>
+						{activeNote.timeLimit}
+					</Text>
 				)}
 
 				<Box

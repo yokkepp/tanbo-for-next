@@ -4,10 +4,10 @@ export type CommonInformation = {
 };
 
 export type TasksInformation = {
-	completedAt: Date;
-	timeLimit: Date;
-	planStart: Date;
-	planEnd: Date;
+	completedAt: string;
+	timeLimit: string;
+	planStart: string;
+	planEnd: string;
 	progress: number;
 };
 
@@ -20,3 +20,8 @@ export type BoardsInformation = {
 	boardStatus: string;
 	boardsArchive: boolean;
 };
+
+export type Informations = CommonInformation &
+	TasksInformation &
+	NotesInformation &
+	BoardsInformation;

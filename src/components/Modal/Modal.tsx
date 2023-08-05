@@ -100,16 +100,12 @@ export function Modal(props) {
 				borderRadius={"10px"}
 				shadow={"10px 10px 10px 0px black"}>
 				<Stack spacing={6} w={"70%"} p={"20px"} textColor={"gray.300"}>
-					<Box display={"flex"} justifyContent={"space-between"}>
-						<Text>作成日:2023年7月20日</Text>
-						<Text>最終更新日:2023年7月20日</Text>
-					</Box>
 					<Box display={"flex"}>
 						<Checkbox colorScheme='teal' size={"lg"} mr={"20px"}></Checkbox>
 						<Input
 							size={"lg"}
 							variant={"outline"}
-							placeholder='テスト'
+							placeholder='件名を入力してください'
 							bg={"gray.700"}
 							border={"none"}
 							value={title}
@@ -123,6 +119,8 @@ export function Modal(props) {
 						bg={"gray.700"}
 						value={description}
 						border={"none"}
+						resize={"none"}
+						placeholder='詳細を入力してください'
 						onChange={handleChangeDescription}></Textarea>
 					<Button
 						h={"100px"}
