@@ -6,22 +6,17 @@ import NotesParts from "@/components/NotesParts";
 import BoardsParts from "@/components/BoardsParts";
 
 import {
-	List,
-	UnorderedList,
 	Text,
 	Box,
 	Stack,
 	Button,
 	Checkbox,
-	Heading,
 	SimpleGrid,
-	border,
 	Input,
 	Textarea,
 } from "@chakra-ui/react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { DeleteIcon } from "@chakra-ui/icons";
-import { Informations } from "../types";
 import { BgMaskForInput } from "@/components/bgMaskForInput";
 import { db } from "../firebase";
 
@@ -32,8 +27,6 @@ import {
 	getDocs,
 	updateDoc,
 } from "firebase/firestore";
-import { resolve } from "path";
-import { NullLiteral } from "typescript";
 
 //あらかじめ設定するNoteデータ
 const INITIAL_DATA = [
@@ -126,7 +119,10 @@ export default function Notes() {
 	const [activeNote, setActiveNote] = useState({});
 
 	//Noteの全データを管理します。
-	const [informations, setInformations] = useState([]);
+	const [informations, setInformations] = useState([{}]);
+
+	//1つのNoteのデータを管理します。
+	const [information, setInformation] = useState({});
 
 	//レンダリング時にfirebaseからデータを読み込む。
 	useEffect(() => {
@@ -141,6 +137,16 @@ export default function Notes() {
 		getDataForfirestore();
 	}, []);
 	//TODO: 通信環境によって、取得できない時がある。失敗時と成功時の処理を各必要がありそう？
+
+	/**
+	 *モーダル内部の
+	 * @param e イベントです。
+	 */
+	const handleChangeInformation = (e, name) => {
+		e.preventDefault();
+		console.log(e);
+		setInformation((prev) => ({ ...prev, [name]: e.target.value }));
+	};
 
 	/**
 	 *クリックされた要素だけを編集中のステータスに変更するための関数です。
@@ -169,9 +175,7 @@ export default function Notes() {
 		e.stopPropagation();
 		if (confirm("本当に削除しますか？")) {
 			const id = e.target.parentElement.id;
-			const newArray = informations.filter(
-				(information) => information.id !== id
-			);
+			const newArray = informations.filter((info) => info.id !== id);
 			setInformations(newArray);
 			setActiveNote({});
 			deleteDoc(doc(db, "informations", id));
@@ -184,28 +188,43 @@ export default function Notes() {
 	 * 編集中以外の要素を押下することで、isEditingを初期化し、値を更新する関数です。
 	 */
 	const updateSubmit = async () => {
-		//firebaseの更新をする。
-		const updateRef = await doc(db, "informations", activeNote.id);
+		//firebaseの更新対象を選択する。
+		const updateRef = doc(db, "informations", activeNote.id);
 
-		const updateInformation = { ...activeNote };
-		//idを削除する前に、informationsも更新してローカルを最新状態にする。
-		const newInformations = informations.map((info) => {
-			if (info.id === activeNote.id) {
-				return activeNote;
-			} else {
-				return info;
-			}
-		});
-		setInformations(newInformations);
 		//updateするときは、idは不要なので、削除したものをupdateする
+		const updateInformation = { ...activeNote };
 		delete updateInformation.id;
-
-		console.log(updateInformation);
 		await updateDoc(updateRef, updateInformation);
 
+		//informationsを更新してローカルを最新状態にする。
+		setInformations((prevInformations) =>
+			prevInformations.map((info) => {
+				if (info.id === activeNote.id) {
+					return activeNote;
+				} else {
+					return info;
+				}
+			})
+		);
 		//編集状態を初期化して解除する
 		setIsEditing(INITIAL_EDITING);
-		console.log("clicked!");
+	};
+
+	/**
+	 * 日時の情報を受け取り、表示したいフォーマットにして返却する関数です。（2023-08-03T14:30 → 2023/08/03 14:30）
+	 * @param date string型の日時データです。（2023-08-03T14:30 ）
+	 */
+	const changeDateFormat = (date) => {
+		const newDate = new Date(date);
+		const year = newDate.getFullYear();
+		const month = (newDate.getMonth() + 1).toString().padStart(2, "0");
+		const day = newDate.getDate().toString().padStart(2, "0");
+		const hours = newDate.getHours().toString().padStart(2, "0");
+		const minutes = newDate.getMinutes().toString().padStart(2, "0");
+		const dateAndTime = `${year}/${month}/${day} ${hours}:${minutes}`;
+		const dateAndTimeInDB = `${year}-${month}-${day}T${hours}:${minutes}`;
+		const serialDate = newDate.getTime();
+		return { dateAndTime, dateAndTimeInDB, serialDate };
 	};
 
 	/**
@@ -214,35 +233,25 @@ export default function Notes() {
 	 */
 	const handleActiveNote = (e) => {
 		e.preventDefault();
-		console.log(e);
-		const newActiveNote = informations.filter(
+		const newActiveNoteArray = informations.filter(
 			(info) => info.id === e.target.id
 		);
-		console.log({ newActiveNote });
-		setActiveNote(newActiveNote[0]);
-	};
-	//TODO: UIにてNoteを追加されたものをクリックすると、エラーが出る。informationsに反映されてないことが原因か？？
 
-	/**
-	 * クリックされた要素を編集する関数です。
-	 */
-	// const handleUpdateInformation = (e, el) => {
-	// 	const;
-	// };
+		const newActiveNote: {} = newActiveNoteArray[0];
+		setActiveNote(newActiveNote);
+	};
 
 	/**編集したい要素を押下した時に発火する関数です。
 	 *@param e イベントです。
 	 */
 	const handleChangeEditingValue = (e: any) => {
-		//setActiveNoteに、現在の値を展開して、上書きしていく
-		const newActiveNote = { ...activeNote, [editingElement]: e.target.value };
-
-		setActiveNote(newActiveNote);
+		setActiveNote((prev) => ({ ...prev, [editingElement]: e.target.value }));
 	};
 
 	useEffect(() => {
 		console.log(activeNote);
-	}, [activeNote]);
+		console.log("informations:", informations);
+	}, [activeNote, informations]);
 
 	return (
 		<>
@@ -250,9 +259,13 @@ export default function Notes() {
 			{isModalOpen ? (
 				<Modal
 					handleModalToggle={handleModalToggle}
+					information={information}
+					setInformation={setInformation}
 					informations={informations}
 					setInformations={setInformations}
 					isEditing={isEditing}
+					handleChangeInformation={handleChangeInformation}
+					changeDateFormat={changeDateFormat}
 				/>
 			) : null}
 			{isEditing.all ? <BgMaskForInput updateSubmit={updateSubmit} /> : null}
@@ -282,7 +295,8 @@ export default function Notes() {
 						onClick={handleModalToggle}>
 						Noteを追加する
 					</Button>
-					{informations.map((info) => {
+					{/* TODO:setInformationsをチェックして、idが必ず設定されるか確認する！ */}
+					{informations.map((info, index) => {
 						if (info.id === activeNote.id) {
 							return (
 								<Button
@@ -367,7 +381,7 @@ export default function Notes() {
 					})}
 				</Stack>
 				<Stack
-					w={"55%"}
+					w={"45%"}
 					bg={"gray.800"}
 					h={"100vh"}
 					overflow={"scroll"}
@@ -417,6 +431,8 @@ export default function Notes() {
 								) : (
 									<Text
 										id='description'
+										w={"100%"}
+										h={"calc(100vh - 200px)"}
 										onClick={(e) => handleClickUpdateElement(e)}>
 										{activeNote.description}
 									</Text>
@@ -434,7 +450,7 @@ export default function Notes() {
 					)}
 				</Stack>
 				<Stack
-					w={"20%"}
+					w={"30%"}
 					bg={"gray.900"}
 					pt={"70px"}
 					pb={"50px"}
@@ -442,22 +458,27 @@ export default function Notes() {
 					color={"gray.300"}
 					h={"100vh"}
 					overflow={"scroll"}>
-					<Stack spacing={6}>
-						<SimpleGrid columns={2} spacingY={3}>
-							<p>作成日：</p>
-							<p>2023/4/10 11:25</p>
-							<p>最終更新日：</p>
-							<p>2023/4/10 23:54</p>
-						</SimpleGrid>
-						<TasksParts
-							isEditing={isEditing}
-							activeNote={activeNote}
-							handleChangeEditingValue={handleChangeEditingValue}
-							handleClickUpdateElement={handleClickUpdateElement}
-						/>
-						<NotesParts />
-						<BoardsParts />
-					</Stack>
+					{Object.keys(activeNote).length ? (
+						<Stack spacing={6}>
+							<SimpleGrid columns={2} spacingY={3}>
+								<p>作成日：</p>
+								<p>{activeNote.createdAt}</p>
+								<p>最終更新日：</p>
+								<p>2023/4/10 23:54</p>
+							</SimpleGrid>
+							<TasksParts
+								isEditing={isEditing}
+								activeNote={activeNote}
+								handleChangeEditingValue={handleChangeEditingValue}
+								handleClickUpdateElement={handleClickUpdateElement}
+								changeDateFormat={changeDateFormat}
+							/>
+							<NotesParts />
+							<BoardsParts />
+						</Stack>
+					) : (
+						<></>
+					)}
 				</Stack>
 			</Box>
 		</>

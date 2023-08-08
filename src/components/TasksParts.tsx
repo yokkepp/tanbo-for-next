@@ -1,10 +1,11 @@
 import { Box, SimpleGrid, Input, Text } from "@chakra-ui/react";
-export default function TasksParts(props) {
+export default function TasksParts(props: any) {
 	const {
 		isEditing,
 		activeNote,
 		handleChangeEditingValue,
 		handleClickUpdateElement,
+		changeDateFormat,
 	} = props;
 	return (
 		<Box>
@@ -68,7 +69,9 @@ export default function TasksParts(props) {
 						borderRight={"solid"}
 						borderColor={"gray.700"}
 						onClick={(e) => handleClickUpdateElement(e)}>
-						{activeNote.timeLimit}
+						{activeNote.timeLimit
+							? changeDateFormat(activeNote.timeLimit).dateAndTime
+							: "-"}
 					</Text>
 				)}
 
@@ -79,14 +82,36 @@ export default function TasksParts(props) {
 					borderColor={"gray.700"}>
 					開始予定：
 				</Box>
-				<Box
-					id='planStart'
-					p={"10px"}
-					borderBottom={"solid"}
-					borderRight={"solid"}
-					borderColor={"gray.700"}>
-					2023/5/15 23:00
-				</Box>
+				{isEditing.planStart ? (
+					<Input
+						id='planStart'
+						type='datetime-local'
+						p={"10px"}
+						border={"none"}
+						_hover={{ border: "none" }}
+						shadow={"none"}
+						borderBottom={"solid"}
+						borderRight={"solid"}
+						borderColor={"gray.700"}
+						position={"relative"}
+						zIndex={"popover"}
+						placeholder='w'
+						onChange={(e) => handleChangeEditingValue(e)}
+						value={activeNote.planStart}
+					/>
+				) : (
+					<Text
+						id='planStart'
+						p={"10px"}
+						borderBottom={"solid"}
+						borderRight={"solid"}
+						borderColor={"gray.700"}
+						onClick={(e) => handleClickUpdateElement(e)}>
+						{activeNote.planStart
+							? changeDateFormat(activeNote.planStart).dateAndTime
+							: "-"}
+					</Text>
+				)}
 				<Box
 					p={"10px"}
 					borderBottom={"solid"}
@@ -94,12 +119,36 @@ export default function TasksParts(props) {
 					borderColor={"gray.700"}>
 					終了予定：
 				</Box>
-				<Box
-					id='planEnd'
-					p={"10px"}
-					borderBottom={"solid"}
-					borderRight={"solid"}
-					borderColor={"gray.700"}></Box>
+				{isEditing.planEnd ? (
+					<Input
+						id='planEnd'
+						type='datetime-local'
+						p={"10px"}
+						border={"none"}
+						_hover={{ border: "none" }}
+						shadow={"none"}
+						borderBottom={"solid"}
+						borderRight={"solid"}
+						borderColor={"gray.700"}
+						position={"relative"}
+						zIndex={"popover"}
+						placeholder='w'
+						onChange={(e) => handleChangeEditingValue(e)}
+						value={activeNote.planEnd}
+					/>
+				) : (
+					<Text
+						id='planEnd'
+						p={"10px"}
+						borderBottom={"solid"}
+						borderRight={"solid"}
+						borderColor={"gray.700"}
+						onClick={(e) => handleClickUpdateElement(e)}>
+						{activeNote.planEnd
+							? changeDateFormat(activeNote.planEnd).dateAndTime
+							: "-"}
+					</Text>
+				)}
 				<Box
 					p={"10px"}
 					borderBottomLeftRadius={"5px"}
@@ -108,15 +157,38 @@ export default function TasksParts(props) {
 					borderColor={"gray.700"}>
 					進捗：
 				</Box>
-				<Box
-					id='progress'
-					p={"10px"}
-					borderBottomRightRadius={"5px"}
-					borderBottom={"solid"}
-					borderRight={"solid"}
-					borderColor={"gray.700"}>
-					10％
-				</Box>
+				{isEditing.progress ? (
+					<Input
+						id='progress'
+						type='number'
+						min={"0"}
+						max={"100"}
+						p={"10px"}
+						border={"none"}
+						_hover={{ border: "none" }}
+						shadow={"none"}
+						borderBottom={"solid"}
+						borderRight={"solid"}
+						borderColor={"gray.700"}
+						position={"relative"}
+						zIndex={"popover"}
+						placeholder='0~100'
+						onChange={(e) => handleChangeEditingValue(e)}
+						value={activeNote.progress}
+					/>
+				) : (
+					<>
+						<Text
+							id='progress'
+							p={"10px"}
+							borderBottom={"solid"}
+							borderRight={"solid"}
+							borderColor={"gray.700"}
+							onClick={(e) => handleClickUpdateElement(e)}>
+							{activeNote.progress ? activeNote.progress + " %" : "-"}
+						</Text>
+					</>
+				)}
 			</SimpleGrid>
 		</Box>
 	);
