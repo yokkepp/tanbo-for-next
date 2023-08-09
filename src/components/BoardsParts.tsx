@@ -1,0 +1,68 @@
+import { Box, SimpleGrid } from "@chakra-ui/react";
+
+export default function BoardsParts() {
+	return (
+		<Box>
+			<Box
+				bg={"blueAlpha.900"}
+				w={"100%"}
+				border={"solid"}
+				borderColor={"blueAlpha.900"}
+				textAlign={"center"}
+				fontWeight={"bold"}
+				roundedTop={"5px"}
+				color={"gray.900"}>
+				Boards
+			</Box>
+			<SimpleGrid columns={2} borderColor={"gray.700"}>
+				<Box
+					p={"10px"}
+					borderBottom={"solid"}
+					borderLeft={"solid"}
+					borderColor={"gray.700"}>
+					ボード名：
+				</Box>
+				<Box
+					id='boardName'
+					p={"10px"}
+					borderBottom={"solid"}
+					borderRight={"solid"}
+					borderColor={"gray.700"}>
+					xxxプロジェクト
+				</Box>
+				<Box
+					id='boardStatus'
+					p={"10px"}
+					borderBottom={"solid"}
+					borderLeft={"solid"}
+					borderColor={"gray.700"}>
+					ステータス：
+				</Box>
+				<Box
+					p={"10px"}
+					borderBottom={"solid"}
+					borderRight={"solid"}
+					borderColor={"gray.700"}>
+					確認中
+				</Box>
+				<Box
+					id='boardsArchive'
+					p={"10px"}
+					borderBottomLeftRadius={"5px"}
+					borderBottom={"solid"}
+					borderLeft={"solid"}
+					borderColor={"gray.700"}>
+					Task完了後：
+				</Box>
+				<Box
+					p={"10px"}
+					borderBottomRightRadius={"5px"}
+					borderBottom={"solid"}
+					borderRight={"solid"}
+					borderColor={"gray.700"}>
+					アーカイブ
+				</Box>
+			</SimpleGrid>
+		</Box>
+	);
+}

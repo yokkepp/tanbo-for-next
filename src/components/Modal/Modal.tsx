@@ -4,31 +4,37 @@ import { useEffect, useRef, useState } from "react";
 import {
 	Box,
 	Button,
-	Text,
-	Heading,
 	Checkbox,
 	Input,
 	Stack,
 	Textarea,
-	Table,
-	TableContainer,
-	TableCaption,
-	Thead,
-	Tbody,
-	Td,
-	Th,
-	Tr,
+	SimpleGrid,
 } from "@chakra-ui/react";
-
+import { db } from "@/app/firebase";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import NotesParts from "../NotesParts";
+import BoardsParts from "../BoardsParts";
 export function Modal(props) {
-	const { handleModalToggle, informations, setInformations } = props;
-	const [title, setTitle] = useState("");
-	const [description, setDescription] = useState("");
+	const {
+		handleModalToggle,
+		information,
+		setInformation,
+		informations,
+		setInformations,
+		isEditing,
+		handleChangeInformation,
+		changeDateFormat,
+	} = props;
 
-	const inputEl = useRef(null);
+	const inputEl = useRef<HTMLElement>(null);
 
+	/**
+	 * モーダル出現時に件名に自動的にフォーカスを当てる
+	 */
 	const focusTitle = () => {
-		inputEl.current.focus();
+		if (inputEl.current !== null) {
+			inputEl.current.focus();
+		}
 	};
 
 	/**
@@ -36,33 +42,30 @@ export function Modal(props) {
 	 * @param e イベントです。
 	 * @function
 	 */
-	const handleChangeTitle = (e) => {
-		setTitle(e.target.value);
-	};
-
-	/**
-	 * 件名の変更を感知して、状態を保管する関数です。
-	 * @param e イベントです。
-	 * @function
-	 */
-	const handleChangeDescription = (e) => {
-		setDescription(e.target.value);
-	};
-
-	/**
-	 * 件名の変更を感知して、状態を保管する関数です。
-	 * @param e イベントです。
-	 * @function
-	 */
-	const handleClickAddInformation = () => {
-		const newInformations = [...informations, { title, description }];
-		setInformations(newInformations);
+	const handleClickAddInformation = async () => {
+		const date = new Date();
+		const now = changeDateFormat(date).dateAndTime;
+		const nowInDB = changeDateFormat(date).dateAndTimeInDB;
+		//firebaseに追加する
+		const docRef = await addDoc(collection(db, "informations"), {
+			...information,
+			createdAt: nowInDB,
+		});
+		console.log(now);
+		setInformations((prev) => [
+			...prev,
+			{ ...information, createdAt: now, id: docRef.id },
+		]);
+		setInformation({});
 		handleModalToggle();
 	};
 
 	useEffect(() => {
 		focusTitle();
 	}, []);
+	useEffect(() => {
+		console.log(information);
+	}, [information]);
 
 	return (
 		<Box
@@ -80,33 +83,35 @@ export function Modal(props) {
 				h={"80%"}
 				w={"80%"}
 				p={"20px"}
-				bg={"black.800"}
+				bg={"gray.800"}
 				display={"flex"}
 				borderRadius={"10px"}
-				shadow={"0px 0px 20px 10px"}>
-				<Stack spacing={7} w={"70%"} p={"20px"} textColor={"gray.300"}>
-					<Box display={"flex"} justifyContent={"space-between"}>
-						<Text>作成日:2023年7月20日</Text>
-						<Text>最終更新日:2023年7月20日</Text>
-					</Box>
+				shadow={"10px 10px 10px 0px black"}>
+				<Stack spacing={6} w={"70%"} p={"20px"} textColor={"gray.300"}>
 					<Box display={"flex"}>
 						<Checkbox colorScheme='teal' size={"lg"} mr={"20px"}></Checkbox>
 						<Input
 							size={"lg"}
 							variant={"outline"}
-							placeholder='テスト'
-							bg={"gray.600"}
-							value={title}
-							onChange={handleChangeTitle}
+							placeholder='件名を入力してください'
+							bg={"gray.700"}
+							border={"none"}
+							value={information.title}
+							onChange={(e) => handleChangeInformation(e, "title")}
 							ref={inputEl}
 						/>
 					</Box>
 					<Textarea
 						w={"100%"}
 						h={"100%"}
-						bg={"gray.600"}
-						value={description}
-						onChange={handleChangeDescription}></Textarea>
+						bg={"gray.700"}
+						value={information.description}
+						border={"none"}
+						resize={"none"}
+						placeholder='詳細を入力してください'
+						onChange={(e) =>
+							handleChangeInformation(e, "description")
+						}></Textarea>
 					<Button
 						h={"100px"}
 						colorScheme='green'
@@ -114,55 +119,139 @@ export function Modal(props) {
 						追加する
 					</Button>
 				</Stack>
-				<Stack w={"30%"} p={"20px"}>
-					<TableContainer>
-						<Table variant={"unstyled"} size={"sm"} textColor={"gray.200"}>
-							<Thead bg={"green"}>
-								<Tr>
-									<Th textColor={"white"}>Tasks</Th>
-									<Th></Th>
-								</Tr>
-							</Thead>
-							<Tbody>
-								<Tr>
-									<Td>完了or未完了</Td>
-									<Td p={0} borderColor={"transparent"}>
-										<Input />
-									</Td>
-								</Tr>
-								<Tr>
-									<Td>完了日</Td>
-									<Td p={0} borderColor={"transparent"}>
-										<Input />
-									</Td>
-								</Tr>
-								<Tr>
-									<Td>期限</Td>
-									<Td p={0} borderColor={"transparent"}>
-										<Input />
-									</Td>
-								</Tr>
-								<Tr>
-									<Td>予定開始日</Td>
-									<Td p={0} borderColor={"transparent"}>
-										<Input />
-									</Td>
-								</Tr>
-								<Tr>
-									<Td>予定終了日</Td>
-									<Td p={0} borderColor={"transparent"}>
-										<Input />
-									</Td>
-								</Tr>
-							</Tbody>
-						</Table>
-					</TableContainer>
+				<Stack spacing={6} w={"30%"} p={"20px"} textColor={"white"}>
+					<Box>
+						<Box
+							bg={"tealAlpha.900"}
+							w={"100%"}
+							border={"solid"}
+							borderColor={"tealAlpha.900"}
+							textAlign={"center"}
+							fontWeight={"bold"}
+							roundedTop={"5px"}
+							color={"gray.900"}>
+							Tasks
+						</Box>
+						<SimpleGrid
+							columns={2}
+							borderColor={"gray.700"}
+							borderTopColor={"tealAlpha.900"}>
+							<Box
+								p={"10px"}
+								borderBottom={"solid"}
+								borderLeft={"solid"}
+								borderColor={"gray.700"}>
+								完了日：
+							</Box>
+							<Box
+								id='completedAt'
+								p={"10px"}
+								borderBottom={"solid"}
+								borderRight={"solid"}
+								borderColor={"gray.700"}></Box>
+							<Box
+								p={"10px"}
+								borderBottom={"solid"}
+								borderLeft={"solid"}
+								borderColor={"gray.700"}>
+								期限：
+							</Box>
+
+							<Input
+								id='timeLimit'
+								type='datetime-local'
+								p={"10px"}
+								border={"none"}
+								_hover={{ border: "none" }}
+								shadow={"none"}
+								borderBottom={"solid"}
+								borderRight={"solid"}
+								borderColor={"gray.700"}
+								position={"relative"}
+								zIndex={"popover"}
+								placeholder='w'
+								onChange={(e) => handleChangeInformation(e, "timeLimit")}
+								value={information.timeLimit}
+							/>
+							<Box
+								p={"10px"}
+								borderBottom={"solid"}
+								borderLeft={"solid"}
+								borderColor={"gray.700"}>
+								開始予定：
+							</Box>
+
+							<Input
+								id='planStart'
+								type='datetime-local'
+								p={"10px"}
+								border={"none"}
+								_hover={{ border: "none" }}
+								shadow={"none"}
+								borderBottom={"solid"}
+								borderRight={"solid"}
+								borderColor={"gray.700"}
+								position={"relative"}
+								zIndex={"popover"}
+								placeholder='w'
+								onChange={(e) => handleChangeInformation(e, "planStart")}
+								value={information.planStart}
+							/>
+
+							<Box
+								p={"10px"}
+								borderBottom={"solid"}
+								borderLeft={"solid"}
+								borderColor={"gray.700"}>
+								終了予定：
+							</Box>
+
+							<Input
+								type='datetime-local'
+								p={"10px"}
+								border={"none"}
+								borderRadius={"none"}
+								_hover={{ border: "none" }}
+								shadow={"none"}
+								borderBottom={"solid"}
+								borderRight={"solid"}
+								borderColor={"gray.700"}
+								position={"relative"}
+								zIndex={"popover"}
+								placeholder='w'
+								h={"100%"}
+								onChange={(e) => handleChangeInformation(e, "planEnd")}
+								value={information.planEnd}
+							/>
+
+							<Box
+								p={"10px"}
+								borderBottomLeftRadius={"5px"}
+								borderBottom={"solid"}
+								borderLeft={"solid"}
+								borderColor={"gray.700"}>
+								進捗：
+							</Box>
+							<Input
+								id='progress'
+								p={"10px"}
+								borderBottomRightRadius={"5px"}
+								borderBottom={"solid"}
+								borderRight={"solid"}
+								borderColor={"gray.700"}
+								onChange={(e) => handleChangeInformation(e, "progress")}
+								value={information.progress}
+							/>
+						</SimpleGrid>
+					</Box>
+					<NotesParts />
+					<BoardsParts />
 				</Stack>
 			</Box>
 			<CloseIcon
-				w={12}
-				h={12}
-				color='gray.500'
+				w={10}
+				h={10}
+				color='gray.600'
 				position={"absolute"}
 				top={"40px"}
 				right={"40px"}
