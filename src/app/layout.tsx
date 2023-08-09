@@ -1,4 +1,5 @@
 // app/layout.tsx
+import Header from "@/components/Header/Header";
 import { Providers } from "./providers";
 
 export default function RootLayout({
@@ -9,6 +10,7 @@ export default function RootLayout({
 	return (
 		<html lang='ja'>
 			<body>
+				<Header />
 				<Providers>{children}</Providers>
 			</body>
 		</html>
