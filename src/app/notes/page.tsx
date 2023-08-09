@@ -1,5 +1,4 @@
 "use client";
-import Header from "@/components/Header/Header";
 import { Modal } from "@/components/Modal/Modal";
 import TasksParts from "@/components/TasksParts";
 import NotesParts from "@/components/NotesParts";
@@ -255,7 +254,6 @@ export default function Notes() {
 
 	return (
 		<>
-			<Header />
 			{isModalOpen ? (
 				<Modal
 					handleModalToggle={handleModalToggle}

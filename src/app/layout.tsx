@@ -1,4 +1,5 @@
-// app/layout.tsx
+"use client";
+import { ChakraProvider } from "@chakra-ui/react";
 import Header from "@/components/Header/Header";
 import { Providers } from "./providers";
 
@@ -10,8 +11,10 @@ export default function RootLayout({
 	return (
 		<html lang='ja'>
 			<body>
-				<Header />
-				<Providers>{children}</Providers>
+				<Providers>
+					<Header />
+					{children}
+				</Providers>
 			</body>
 		</html>
 	);

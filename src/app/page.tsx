@@ -1,11 +1,11 @@
 "use client";
-import Header from "../components/Header/Header";
+
+import { Box, Text } from "@chakra-ui/react";
 
 export default function Home() {
 	return (
-		<>
-			<Header />
-			<main>Hello</main>
-		</>
+		<Box pt={"70px"}>
+			<Text>これはホームです。</Text>
+		</Box>
 	);
 }

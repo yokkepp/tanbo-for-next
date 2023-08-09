@@ -1,9 +1,10 @@
-import Header from "@/components/Header/Header";
+"use client";
+import { Box } from "@chakra-ui/react";
+
 export default function boards() {
 	return (
-		<>
-			<Header />
-			<h1>これはボードです。</h1>
-		</>
+		<Box pt={"70px"}>
+			<h1>これはボードです。</h1>;
+		</Box>
 	);
 }

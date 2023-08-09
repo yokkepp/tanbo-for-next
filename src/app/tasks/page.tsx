@@ -24,7 +24,6 @@ import { CopyIcon, DeleteIcon } from "@chakra-ui/icons";
 export default function Tasks() {
 	return (
 		<>
-			<Header />
 			<Box w={"100%"} h={"100vh"} pt={"70px"} bg={"gray.900"} px={"20px"}>
 				<Stack spacing={16}>
 					<Box display={"flex"} justifyContent={"space-between"}>

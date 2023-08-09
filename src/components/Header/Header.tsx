@@ -1,21 +1,6 @@
 "use client";
 import Link from "next/link";
-import {
-	Box,
-	Text,
-	Flex,
-	List,
-	ListItem,
-	ListIcon,
-	OrderedList,
-	UnorderedList,
-	Spacer,
-	Button,
-	Center,
-} from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
-import { color } from "framer-motion";
-import { useRouter } from "next/router";
+import { Box, Text, Button } from "@chakra-ui/react";
 
 export default function Header() {
 	const menus = [
