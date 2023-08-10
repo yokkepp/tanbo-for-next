@@ -63,9 +63,6 @@ export function Modal(props) {
 	useEffect(() => {
 		focusTitle();
 	}, []);
-	useEffect(() => {
-		console.log(information);
-	}, [information]);
 
 	return (
 		<Box
@@ -89,7 +86,11 @@ export function Modal(props) {
 				shadow={"10px 10px 10px 0px black"}>
 				<Stack spacing={6} w={"70%"} p={"20px"} textColor={"gray.300"}>
 					<Box display={"flex"}>
-						<Checkbox colorScheme='teal' size={"lg"} mr={"20px"}></Checkbox>
+						<Checkbox
+							colorScheme='teal'
+							size={"lg"}
+							mr={"20px"}
+							onChange={(e) => handleChangeInformation(e, "done")}></Checkbox>
 						<Input
 							size={"lg"}
 							variant={"outline"}

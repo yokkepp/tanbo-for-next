@@ -131,10 +131,11 @@ export default function Tasks() {
 										<Tbody>
 											{informations.map((info) => {
 												return (
-													<Tr key={info.id}>
+													<Tr key={info.id} id={info.id}>
 														<Td textColor={"white"}>
 															<Checkbox
 																colorScheme='teal'
+																variant={"circular"}
 																size={"lg"}></Checkbox>
 														</Td>
 														<Td textColor={"white"}>{info.createdAt}</Td>
@@ -191,9 +192,10 @@ export default function Tasks() {
 										<Tbody>
 											{informations.map((info) => {
 												return (
-													<Tr key={info.id}>
+													<Tr key={info.id} id={info.id}>
 														<Td textColor={"white"}>
 															<Checkbox
+																variant={"circular"}
 																colorScheme='teal'
 																size={"lg"}></Checkbox>
 														</Td>

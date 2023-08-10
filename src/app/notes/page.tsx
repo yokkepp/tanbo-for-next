@@ -1,8 +1,11 @@
 "use client";
+import { InformationsContextObject } from "../layout";
+import { useState, useEffect, useContext } from "react";
 import { Modal } from "@/components/Modal/Modal";
 import TasksParts from "@/components/TasksParts";
 import NotesParts from "@/components/NotesParts";
 import BoardsParts from "@/components/BoardsParts";
+import { BgMaskForInput } from "@/components/bgMaskForInput";
 import { Informations } from "../types";
 import {
 	Text,
@@ -14,10 +17,8 @@ import {
 	Input,
 	Textarea,
 } from "@chakra-ui/react";
-import { useState, useEffect, useContext } from "react";
 import { DeleteIcon } from "@chakra-ui/icons";
-import { BgMaskForInput } from "@/components/bgMaskForInput";
-import { InformationsContextObject } from "../layout";
+import { checkboxTheme } from "../checkboxTheme";
 import { db } from "../firebase";
 import {
 	collection,
@@ -29,6 +30,7 @@ import {
 
 //全てのプロパティの値をfalseにする
 const INITIAL_EDITING = {
+	done: false,
 	title: false,
 	description: false,
 	completedAt: false,
@@ -55,6 +57,7 @@ export default function Notes() {
 
 	//Tasksコンポーネントの状態を管理します。
 	const [tasksState, setTasksState] = useState({
+		done: false,
 		completedAt: "",
 		timeLimit: "",
 		planStart: "",
@@ -332,7 +335,11 @@ export default function Notes() {
 					{Object.keys(activeNote).length ? (
 						<>
 							<Box display={"flex"}>
-								<Checkbox colorScheme='teal' size={"lg"} mr={"15px"}></Checkbox>
+								<Checkbox
+									variant={"circular"}
+									colorScheme={"teal"}
+									size={"lg"}
+									mr={"15px"}></Checkbox>
 								{isEditing.title ? (
 									<Input
 										id='title'
