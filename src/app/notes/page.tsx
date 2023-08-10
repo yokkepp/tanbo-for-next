@@ -14,11 +14,11 @@ import {
 	Input,
 	Textarea,
 } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { DeleteIcon } from "@chakra-ui/icons";
 import { BgMaskForInput } from "@/components/bgMaskForInput";
+import { InformationsContextObject } from "../layout";
 import { db } from "../firebase";
-
 import {
 	collection,
 	deleteDoc,
@@ -73,9 +73,6 @@ export default function Notes() {
 	});
 	//表示されるNoteを管理します。
 	const [activeNote, setActiveNote] = useState({});
-
-	//Noteの全データを管理します。
-	const [informations, setInformations] = useState([]);
 
 	//1つのNoteのデータを管理します。
 	const [information, setInformation] = useState({});
@@ -195,20 +192,12 @@ export default function Notes() {
 	// 	console.log("informations:", informations);
 	// }, [activeNote, informations]);
 
-	//レンダリング時にfirebaseからデータを読み込む。
-	useEffect(() => {
-		console.log("初回レンダリング");
-		const infoData = collection(db, "informations");
-		getDocs(infoData).then((result) => {
-			const INITIAL_DATA = [];
-			result.forEach((doc) => {
-				INITIAL_DATA.push({ ...doc.data(), id: doc.id });
-			});
-			setInformations(INITIAL_DATA);
-		});
-	}, []);
-
 	//TODO: 通信環境によって、取得できない時がある。失敗時と成功時の処理を各必要がありそう？
+
+	const { informations, setInformations } = useContext(
+		InformationsContextObject
+	);
+
 	return (
 		<>
 			{isModalOpen ? (
