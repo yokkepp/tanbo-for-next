@@ -1,9 +1,10 @@
 "use client";
+//TODO:informationsの型を設定しよう
 import { Modal } from "@/components/Modal/Modal";
 import TasksParts from "@/components/TasksParts";
 import NotesParts from "@/components/NotesParts";
 import BoardsParts from "@/components/BoardsParts";
-
+import { Informations } from "../types";
 import {
 	Text,
 	Box,
@@ -26,49 +27,6 @@ import {
 	getDocs,
 	updateDoc,
 } from "firebase/firestore";
-
-//あらかじめ設定するNoteデータ
-const INITIAL_DATA = [
-	{
-		title: "タイトル1",
-		description: "詳細1",
-		completedAt: "",
-		timeLimit: "",
-		planStart: "",
-		planEnd: "",
-		progress: "",
-		notesArchive: "",
-		boardName: "",
-		boardStatus: "",
-		boardsArchive: "",
-	},
-	{
-		title: "タイトル2",
-		description: "詳細2",
-		completedAt: "",
-		timeLimit: "",
-		planStart: "",
-		planEnd: "",
-		progress: "",
-		notesArchive: "",
-		boardName: "",
-		boardStatus: "",
-		boardsArchive: "",
-	},
-	{
-		title: "タイトル3",
-		description: "詳細3",
-		completedAt: "",
-		timeLimit: "",
-		planStart: "",
-		planEnd: "",
-		progress: "",
-		notesArchive: "",
-		boardName: "",
-		boardStatus: "",
-		boardsArchive: "",
-	},
-];
 
 //全てのプロパティの値をfalseにする
 const INITIAL_EDITING = {
@@ -118,24 +76,10 @@ export default function Notes() {
 	const [activeNote, setActiveNote] = useState({});
 
 	//Noteの全データを管理します。
-	const [informations, setInformations] = useState([{}]);
+	const [informations, setInformations] = useState([]);
 
 	//1つのNoteのデータを管理します。
 	const [information, setInformation] = useState({});
-
-	//レンダリング時にfirebaseからデータを読み込む。
-	useEffect(() => {
-		const getDataForfirestore = async () => {
-			const querySnapshot = await getDocs(collection(db, "informations"));
-			const INITIAL_DATA_FOR_FIRESTORE = [];
-			querySnapshot.forEach((doc) => {
-				INITIAL_DATA_FOR_FIRESTORE.push({ ...doc.data(), id: doc.id });
-			});
-			setInformations(INITIAL_DATA_FOR_FIRESTORE);
-		};
-		getDataForfirestore();
-	}, []);
-	//TODO: 通信環境によって、取得できない時がある。失敗時と成功時の処理を各必要がありそう？
 
 	/**
 	 *モーダル内部の
@@ -247,11 +191,26 @@ export default function Notes() {
 		setActiveNote((prev) => ({ ...prev, [editingElement]: e.target.value }));
 	};
 
-	useEffect(() => {
-		console.log(activeNote);
-		console.log("informations:", informations);
-	}, [activeNote, informations]);
+	// useEffect(() => {
+	// 	console.log(activeNote);
+	// 	console.log("informations:", informations);
+	// }, [activeNote, informations]);
 
+	//レンダリング時にfirebaseからデータを読み込む。
+	useEffect(() => {
+		console.log("初回レンダリング");
+		const infoData = collection(db, "informations");
+		getDocs(infoData).then((result) => {
+			const INITIAL_DATA = [];
+			result.forEach((doc) => {
+				INITIAL_DATA.push({ ...doc.data(), id: doc.id });
+			});
+			setInformations(INITIAL_DATA);
+		});
+	}, []);
+
+	//TODO:トップレベルで一度のみ読み込む？
+	//TODO: 通信環境によって、取得できない時がある。失敗時と成功時の処理を各必要がありそう？
 	return (
 		<>
 			{isModalOpen ? (
@@ -295,6 +254,7 @@ export default function Notes() {
 					</Button>
 					{/* TODO:setInformationsをチェックして、idが必ず設定されるか確認する！ */}
 					{informations.map((info, index) => {
+						console.log(index, info.id);
 						if (info.id === activeNote.id) {
 							return (
 								<Button
