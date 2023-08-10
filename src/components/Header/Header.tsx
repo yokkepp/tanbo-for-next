@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { Box, Text, Button } from "@chakra-ui/react";
+import { Box, Text, Button, Image } from "@chakra-ui/react";
 
 export default function Header() {
 	const menus = [
@@ -43,9 +43,8 @@ export default function Header() {
 			position={"fixed"}
 			zIndex={"banner"}>
 			<Box display='flex' alignItems={"center"}>
-				<Text mr={50}>TaNBo</Text>
-				{/* TODO: ロゴを画像に差し替える */}
-				<Box display={"flex"}>
+				<Image h='25px' src='logo.png' alt='logo' />
+				<Box display={"flex"} ml={"50px"}>
 					{menus.map((menu) => {
 						// TODO: 現在のパスを取得し、色を特定する。
 						if ("/note" === menu.link) {

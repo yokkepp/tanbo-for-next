@@ -1,5 +1,4 @@
 "use client";
-//TODO:informationsの型を設定しよう
 import { Modal } from "@/components/Modal/Modal";
 import TasksParts from "@/components/TasksParts";
 import NotesParts from "@/components/NotesParts";
@@ -209,7 +208,6 @@ export default function Notes() {
 		});
 	}, []);
 
-	//TODO:トップレベルで一度のみ読み込む？
 	//TODO: 通信環境によって、取得できない時がある。失敗時と成功時の処理を各必要がありそう？
 	return (
 		<>
