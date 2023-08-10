@@ -187,11 +187,6 @@ export default function Notes() {
 		setActiveNote((prev) => ({ ...prev, [editingElement]: e.target.value }));
 	};
 
-	// useEffect(() => {
-	// 	console.log(activeNote);
-	// 	console.log("informations:", informations);
-	// }, [activeNote, informations]);
-
 	//TODO: 通信環境によって、取得できない時がある。失敗時と成功時の処理を各必要がありそう？
 
 	const { informations, setInformations } = useContext(

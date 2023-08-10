@@ -16,17 +16,24 @@ import {
 	Checkbox,
 } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon } from "@chakra-ui/icons";
-import { useContext } from "react";
+import { useState, useContext } from "react";
 import { InformationsContextObject } from "../layout";
 
 export default function Tasks() {
 	const { informations, setInformations } = useContext(
 		InformationsContextObject
 	);
-
+	const [doneList, setDoneList] = useState([]);
+	const [notDoneList, setNotDoneList] = useState([]);
+	const [localInformations, setLocalInformations] = useState([]);
+	const [sortCondition, setSortCondition] = useState(""); //TODO:どの条件で入れる？？
+	const [quickTitle, setQuickTitle] = useState("");
 	//TODO: useState localInformationsを用意して、informationsをまとめて表示する時も表示形式を変更しておく必要がある。
 	//TODO: 検索機能を実装する必要がある。ソート機能を作成して、doneList notDoneListを作成して、それぞれに格納→表示する。
 
+	const handleChangeQuickTitle = (e) => {
+		setQuickTitle(e.target.value);
+	};
 	return (
 		<>
 			<Box w={"100%"} h={"100vh"} pt={"70px"} bg={"gray.900"} px={"20px"}>
@@ -71,10 +78,23 @@ export default function Tasks() {
 							</Box>
 						</Box>
 						<Box display={"flex"} w={"40%"}>
-							<Input placeholder='クイック作成' mr={"10px"} />
-							<Button colorScheme='green'>詳細追加</Button>
+							<Input
+								placeholder='クイック作成'
+								textColor={"white"}
+								mr={"10px"}
+								value={quickTitle}
+								onChange={(e) => handleChangeQuickTitle(e)}
+							/>
+							{quickTitle ? (
+								<Button w={"130px"} colorScheme='green'>
+									クイック追加
+								</Button>
+							) : (
+								<Button w={"130px"} colorScheme='green'>
+									詳細追加
+								</Button>
+							)}
 						</Box>
-						{/* TODO:クイック作成に文字があれば、クイック作成、なければ詳細追加でモーダル出す */}
 					</Box>
 					<Box h={"calc(100vh - 160px)"} overflow={"scroll"}>
 						<Box
