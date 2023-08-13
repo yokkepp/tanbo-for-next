@@ -18,7 +18,6 @@ import {
 	Textarea,
 } from "@chakra-ui/react";
 import { DeleteIcon } from "@chakra-ui/icons";
-import { checkboxTheme } from "../checkboxTheme";
 import { db } from "../firebase";
 import {
 	collection,
@@ -30,7 +29,6 @@ import {
 
 //全てのプロパティの値をfalseにする
 const INITIAL_EDITING = {
-	done: false,
 	title: false,
 	description: false,
 	completedAt: false,
@@ -55,37 +53,42 @@ export default function Notes() {
 	//編集中のプロパティ名を管理します。（title, descriptionなど）
 	const [editingElement, setEditingElement] = useState("");
 
-	//Tasksコンポーネントの状態を管理します。
-	const [tasksState, setTasksState] = useState({
-		done: false,
-		completedAt: "",
-		timeLimit: "",
-		planStart: "",
-		planEnd: "",
-		progress: 0,
-	});
-	//Notesコンポーネントの状態を管理します。
-	const [notesState, setNotesState] = useState({
-		notesArchive: true,
-	});
-	//Boardsコンポーネントの状態を管理します。
-	const [boardsState, setBoardsState] = useState({
-		boardName: "",
-		boardStatus: "",
-		boardsArchive: true,
-	});
+	// //Tasksコンポーネントの状態を管理します。
+	// const [tasksState, setTasksState] = useState({
+	// 	done: false,
+	// 	completedAt: "",
+	// 	timeLimit: "",
+	// 	planStart: "",
+	// 	planEnd: "",
+	// 	progress: 0,
+	// });
+	// //Notesコンポーネントの状態を管理します。
+	// const [notesState, setNotesState] = useState({
+	// 	notesArchive: true,
+	// });
+	// //Boardsコンポーネントの状態を管理します。
+	// const [boardsState, setBoardsState] = useState({
+	// 	boardName: "",
+	// 	boardStatus: "",
+	// 	boardsArchive: true,
+	// });
+
 	//表示されるNoteを管理します。
 	const [activeNote, setActiveNote] = useState({});
 
-	//1つのNoteのデータを管理します。
+	//1つのデータを管理します。
 	const [information, setInformation] = useState({});
+
+	//全てのデータを管理します。
+	const { informations, setInformations } = useContext(
+		InformationsContextObject
+	);
 
 	/**
 	 *モーダル内部の
 	 * @param e イベントです。
 	 */
 	const handleChangeInformation = (e, name) => {
-		e.preventDefault();
 		console.log(e);
 		setInformation((prev) => ({ ...prev, [name]: e.target.value }));
 	};
@@ -139,8 +142,8 @@ export default function Notes() {
 		await updateDoc(updateRef, updateInformation);
 
 		//informationsを更新してローカルを最新状態にする。
-		setInformations((prevInformations) =>
-			prevInformations.map((info) => {
+		setInformations((prev) =>
+			prev.map((info) => {
 				if (info.id === activeNote.id) {
 					return activeNote;
 				} else {
@@ -174,7 +177,6 @@ export default function Notes() {
 	 * @param e イベントです。
 	 */
 	const handleActiveNote = (e) => {
-		e.preventDefault();
 		const newActiveNoteArray = informations.filter(
 			(info) => info.id === e.target.id
 		);
@@ -192,9 +194,31 @@ export default function Notes() {
 
 	//TODO: 通信環境によって、取得できない時がある。失敗時と成功時の処理を各必要がありそう？
 
-	const { informations, setInformations } = useContext(
-		InformationsContextObject
-	);
+	//TODO: チェックボックスを変更した際に、ローカルの更新とfirebaseの両方を変更する。
+	const handleChangeCheckbox = async (e) => {
+		//ローカルのdoneを更新する
+		console.log("before activeNote", activeNote.done);
+		setActiveNote((prev) => ({ ...prev, done: !activeNote.done }));
+		setInformations((prev) =>
+			prev.map((info) => {
+				if (info.id === activeNote.id) {
+					return activeNote;
+				} else {
+					return info;
+				}
+			})
+		);
+		console.log("after activeNote", activeNote.done);
+
+		//firebaseのdoneを更新する
+		//firebaseの更新対象を選択する。
+		const updateRef = doc(db, "informations", activeNote.id);
+
+		//updateするときは、idは不要なので、削除したものをupdateする
+		const updateInformation = { ...activeNote };
+		delete updateInformation.id;
+		await updateDoc(updateRef, updateInformation);
+	};
 
 	return (
 		<>
@@ -237,7 +261,6 @@ export default function Notes() {
 						onClick={handleModalToggle}>
 						Noteを追加する
 					</Button>
-					{/* TODO:setInformationsをチェックして、idが必ず設定されるか確認する！ */}
 					{informations.map((info, index) => {
 						console.log(index, info.id);
 						if (info.id === activeNote.id) {
@@ -335,11 +358,28 @@ export default function Notes() {
 					{Object.keys(activeNote).length ? (
 						<>
 							<Box display={"flex"}>
+								{/* {activeNote.done ? (
+									<Checkbox
+										isChecked
+										variant={"circular"}
+										colorScheme={"teal"}
+										size={"lg"}
+										mr={"15px"}
+										onChange={(e) => handleChangeCheckbox(e)}></Checkbox>
+								) : (
+									<Checkbox
+										variant={"circular"}
+										colorScheme={"teal"}
+										size={"lg"}
+										mr={"15px"}
+										onChange={(e) => handleChangeCheckbox(e)}></Checkbox>
+								)} */}
 								<Checkbox
 									variant={"circular"}
 									colorScheme={"teal"}
 									size={"lg"}
-									mr={"15px"}></Checkbox>
+									mr={"15px"}
+									onChange={(e) => handleChangeCheckbox(e)}></Checkbox>
 								{isEditing.title ? (
 									<Input
 										id='title'
