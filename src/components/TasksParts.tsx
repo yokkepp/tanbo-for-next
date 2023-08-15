@@ -2,7 +2,7 @@ import { Box, SimpleGrid, Input, Text } from "@chakra-ui/react";
 export default function TasksParts(props: any) {
 	const {
 		isEditing,
-		activeNote,
+		activeInformation,
 		handleChangeEditingValue,
 		handleClickUpdateElement,
 		changeDateFormat,
@@ -59,7 +59,7 @@ export default function TasksParts(props: any) {
 						zIndex={"popover"}
 						placeholder='w'
 						onChange={(e) => handleChangeEditingValue(e)}
-						value={activeNote.timeLimit}
+						value={activeInformation.timeLimit}
 					/>
 				) : (
 					<Text
@@ -69,8 +69,8 @@ export default function TasksParts(props: any) {
 						borderRight={"solid"}
 						borderColor={"gray.700"}
 						onClick={(e) => handleClickUpdateElement(e)}>
-						{activeNote.timeLimit
-							? changeDateFormat(activeNote.timeLimit).dateAndTime
+						{activeInformation.timeLimit
+							? changeDateFormat(activeInformation.timeLimit).dateAndTime
 							: "-"}
 					</Text>
 				)}
@@ -97,7 +97,7 @@ export default function TasksParts(props: any) {
 						zIndex={"popover"}
 						placeholder='w'
 						onChange={(e) => handleChangeEditingValue(e)}
-						value={activeNote.planStart}
+						value={activeInformation.planStart}
 					/>
 				) : (
 					<Text
@@ -107,8 +107,8 @@ export default function TasksParts(props: any) {
 						borderRight={"solid"}
 						borderColor={"gray.700"}
 						onClick={(e) => handleClickUpdateElement(e)}>
-						{activeNote.planStart
-							? changeDateFormat(activeNote.planStart).dateAndTime
+						{activeInformation.planStart
+							? changeDateFormat(activeInformation.planStart).dateAndTime
 							: "-"}
 					</Text>
 				)}
@@ -134,7 +134,7 @@ export default function TasksParts(props: any) {
 						zIndex={"popover"}
 						placeholder='w'
 						onChange={(e) => handleChangeEditingValue(e)}
-						value={activeNote.planEnd}
+						value={activeInformation.planEnd}
 					/>
 				) : (
 					<Text
@@ -144,8 +144,8 @@ export default function TasksParts(props: any) {
 						borderRight={"solid"}
 						borderColor={"gray.700"}
 						onClick={(e) => handleClickUpdateElement(e)}>
-						{activeNote.planEnd
-							? changeDateFormat(activeNote.planEnd).dateAndTime
+						{activeInformation.planEnd
+							? changeDateFormat(activeInformation.planEnd).dateAndTime
 							: "-"}
 					</Text>
 				)}
@@ -174,7 +174,7 @@ export default function TasksParts(props: any) {
 						zIndex={"popover"}
 						placeholder='0~100'
 						onChange={(e) => handleChangeEditingValue(e)}
-						value={activeNote.progress}
+						value={activeInformation.progress}
 					/>
 				) : (
 					<>
@@ -185,7 +185,9 @@ export default function TasksParts(props: any) {
 							borderRight={"solid"}
 							borderColor={"gray.700"}
 							onClick={(e) => handleClickUpdateElement(e)}>
-							{activeNote.progress ? activeNote.progress + " %" : "-"}
+							{activeInformation.progress
+								? activeInformation.progress + " %"
+								: "-"}
 						</Text>
 					</>
 				)}

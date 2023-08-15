@@ -21,7 +21,6 @@ export default function RootLayout({
 
 	//レンダリング時にfirebaseからデータを読み込む。
 	useEffect(() => {
-		console.log("初回レンダリング");
 		const infoData = collection(db, "informations");
 		getDocs(infoData).then((result) => {
 			const INITIAL_DATA = [];

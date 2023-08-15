@@ -17,16 +17,17 @@ import BoardsParts from "../BoardsParts";
 export function Modal(props) {
 	const {
 		handleModalToggle,
-		information,
-		setInformation,
-		informations,
+		setActiveInformation,
+		activeInformation,
 		setInformations,
+		informations,
 		isEditing,
 		handleChangeInformation,
 		changeDateFormat,
 	} = props;
 
 	const inputEl = useRef<HTMLElement>(null);
+	const [addingInformation, setAddingInformation] = useState({});
 
 	/**
 	 * モーダル出現時に件名に自動的にフォーカスを当てる
@@ -48,15 +49,14 @@ export function Modal(props) {
 		const nowInDB = changeDateFormat(date).dateAndTimeInDB;
 		//firebaseに追加する
 		const docRef = await addDoc(collection(db, "informations"), {
-			...information,
+			...activeInformation,
 			createdAt: nowInDB,
 		});
-		console.log(now);
 		setInformations((prev) => [
 			...prev,
-			{ ...information, createdAt: now, id: docRef.id },
+			{ ...activeInformation, createdAt: now, id: docRef.id },
 		]);
-		setInformation({});
+		setActiveInformation({});
 		handleModalToggle();
 	};
 
@@ -86,18 +86,13 @@ export function Modal(props) {
 				shadow={"10px 10px 10px 0px black"}>
 				<Stack spacing={6} w={"70%"} p={"20px"} textColor={"gray.300"}>
 					<Box display={"flex"}>
-						<Checkbox
-							colorScheme='teal'
-							size={"lg"}
-							mr={"20px"}
-							onChange={(e) => handleChangeInformation(e, "done")}></Checkbox>
 						<Input
 							size={"lg"}
 							variant={"outline"}
 							placeholder='件名を入力してください'
 							bg={"gray.700"}
 							border={"none"}
-							value={information.title}
+							value={activeInformation.title}
 							onChange={(e) => handleChangeInformation(e, "title")}
 							ref={inputEl}
 						/>
@@ -106,7 +101,7 @@ export function Modal(props) {
 						w={"100%"}
 						h={"100%"}
 						bg={"gray.700"}
-						value={information.description}
+						value={activeInformation.description}
 						border={"none"}
 						resize={"none"}
 						placeholder='詳細を入力してください'
@@ -142,19 +137,6 @@ export function Modal(props) {
 								borderBottom={"solid"}
 								borderLeft={"solid"}
 								borderColor={"gray.700"}>
-								完了日：
-							</Box>
-							<Box
-								id='completedAt'
-								p={"10px"}
-								borderBottom={"solid"}
-								borderRight={"solid"}
-								borderColor={"gray.700"}></Box>
-							<Box
-								p={"10px"}
-								borderBottom={"solid"}
-								borderLeft={"solid"}
-								borderColor={"gray.700"}>
 								期限：
 							</Box>
 
@@ -172,7 +154,7 @@ export function Modal(props) {
 								zIndex={"popover"}
 								placeholder='w'
 								onChange={(e) => handleChangeInformation(e, "timeLimit")}
-								value={information.timeLimit}
+								value={activeInformation.timeLimit}
 							/>
 							<Box
 								p={"10px"}
@@ -196,7 +178,7 @@ export function Modal(props) {
 								zIndex={"popover"}
 								placeholder='w'
 								onChange={(e) => handleChangeInformation(e, "planStart")}
-								value={information.planStart}
+								value={activeInformation.planStart}
 							/>
 
 							<Box
@@ -222,7 +204,7 @@ export function Modal(props) {
 								placeholder='w'
 								h={"100%"}
 								onChange={(e) => handleChangeInformation(e, "planEnd")}
-								value={information.planEnd}
+								value={activeInformation.planEnd}
 							/>
 
 							<Box
@@ -241,7 +223,7 @@ export function Modal(props) {
 								borderRight={"solid"}
 								borderColor={"gray.700"}
 								onChange={(e) => handleChangeInformation(e, "progress")}
-								value={information.progress}
+								value={activeInformation.progress}
 							/>
 						</SimpleGrid>
 					</Box>

@@ -73,11 +73,8 @@ export default function Notes() {
 	// 	boardsArchive: true,
 	// });
 
-	//表示されるNoteを管理します。
-	const [activeNote, setActiveNote] = useState({});
-
 	//1つのデータを管理します。
-	const [information, setInformation] = useState({});
+	const [activeInformation, setActiveInformation] = useState({});
 
 	//全てのデータを管理します。
 	const { informations, setInformations } = useContext(
@@ -89,8 +86,7 @@ export default function Notes() {
 	 * @param e イベントです。
 	 */
 	const handleChangeInformation = (e, name) => {
-		console.log(e);
-		setInformation((prev) => ({ ...prev, [name]: e.target.value }));
+		setActiveInformation((prev) => ({ ...prev, [name]: e.target.value }));
 	};
 
 	/**
@@ -122,7 +118,7 @@ export default function Notes() {
 			const id = e.target.parentElement.id;
 			const newArray = informations.filter((info) => info.id !== id);
 			setInformations(newArray);
-			setActiveNote({});
+			setActiveInformation({});
 			deleteDoc(doc(db, "informations", id));
 		} else {
 			alert("キャンセルしました。");
@@ -134,18 +130,18 @@ export default function Notes() {
 	 */
 	const updateSubmit = async () => {
 		//firebaseの更新対象を選択する。
-		const updateRef = doc(db, "informations", activeNote.id);
+		const updateRef = doc(db, "informations", activeInformation.id);
 
 		//updateするときは、idは不要なので、削除したものをupdateする
-		const updateInformation = { ...activeNote };
+		const updateInformation = { ...activeInformation };
 		delete updateInformation.id;
 		await updateDoc(updateRef, updateInformation);
 
 		//informationsを更新してローカルを最新状態にする。
 		setInformations((prev) =>
 			prev.map((info) => {
-				if (info.id === activeNote.id) {
-					return activeNote;
+				if (info.id === activeInformation.id) {
+					return activeInformation;
 				} else {
 					return info;
 				}
@@ -176,46 +172,53 @@ export default function Notes() {
 	 * アクティブ表示されるinformationを選択する関数です。
 	 * @param e イベントです。
 	 */
-	const handleActiveNote = (e) => {
-		const newActiveNoteArray = informations.filter(
+	const handleActiveInformation = (e) => {
+		const newActiveInformationArray = informations.filter(
 			(info) => info.id === e.target.id
 		);
 
-		const newActiveNote: {} = newActiveNoteArray[0];
-		setActiveNote(newActiveNote);
+		const newActiveInformation: {} = newActiveInformationArray[0];
+		setActiveInformation(newActiveInformation);
 	};
 
 	/**編集したい要素を押下した時に発火する関数です。
 	 *@param e イベントです。
 	 */
 	const handleChangeEditingValue = (e: any) => {
-		setActiveNote((prev) => ({ ...prev, [editingElement]: e.target.value }));
+		setActiveInformation((prev) => ({
+			...prev,
+			[editingElement]: e.target.value,
+		}));
 	};
 
-	//TODO: 通信環境によって、取得できない時がある。失敗時と成功時の処理を各必要がありそう？
-
-	//TODO: チェックボックスを変更した際に、ローカルの更新とfirebaseの両方を変更する。
-	const handleChangeCheckbox = async (e) => {
+	//PROB:一つのinformationに対して、activeInformation, informations, firebaseのDBの3つを更新している。冗長になっている気がするが他の方法が知りたい。
+	const handleChangeCheckbox = async () => {
 		//ローカルのdoneを更新する
-		console.log("before activeNote", activeNote.done);
-		setActiveNote((prev) => ({ ...prev, done: !activeNote.done }));
-		setInformations((prev) =>
-			prev.map((info) => {
-				if (info.id === activeNote.id) {
-					return activeNote;
+		setActiveInformation((prev) => ({
+			...prev,
+			done: !activeInformation.done,
+		}));
+
+		const newInformations = [...informations];
+		setInformations(
+			newInformations.map((info) => {
+				if (info.id === activeInformation.id) {
+					return { ...activeInformation, done: !activeInformation.done };
 				} else {
 					return info;
 				}
 			})
 		);
-		console.log("after activeNote", activeNote.done);
 
 		//firebaseのdoneを更新する
 		//firebaseの更新対象を選択する。
-		const updateRef = doc(db, "informations", activeNote.id);
+		const updateRef = doc(db, "informations", activeInformation.id);
 
 		//updateするときは、idは不要なので、削除したものをupdateする
-		const updateInformation = { ...activeNote };
+		const updateInformation = {
+			...activeInformation,
+			done: !activeInformation.done,
+		};
 		delete updateInformation.id;
 		await updateDoc(updateRef, updateInformation);
 	};
@@ -225,8 +228,8 @@ export default function Notes() {
 			{isModalOpen ? (
 				<Modal
 					handleModalToggle={handleModalToggle}
-					information={information}
-					setInformation={setInformation}
+					activeInformation={activeInformation}
+					setActiveInformation={setActiveInformation}
 					informations={informations}
 					setInformations={setInformations}
 					isEditing={isEditing}
@@ -261,9 +264,8 @@ export default function Notes() {
 						onClick={handleModalToggle}>
 						Noteを追加する
 					</Button>
-					{informations.map((info, index) => {
-						console.log(index, info.id);
-						if (info.id === activeNote.id) {
+					{informations.map((info) => {
+						if (info.id === activeInformation.id) {
 							return (
 								<Button
 									key={info.id}
@@ -273,14 +275,14 @@ export default function Notes() {
 									h={"50px"}
 									p={"10px"}
 									bg={"orangeAlpha.900"}
-									onClick={(e) => handleActiveNote(e)}>
+									onClick={(e) => handleActiveInformation(e)}>
 									<Box
 										overflow={"hidden"}
 										textOverflow={"ellipsis"}
 										pointerEvents={"none"}
 										w={"100%"}
 										textAlign={"left"}>
-										{activeNote.title}
+										{activeInformation.title}
 									</Box>
 
 									<Box
@@ -313,7 +315,7 @@ export default function Notes() {
 									h={"50px"}
 									p={"10px"}
 									bg={"orangeAlpha.200"}
-									onClick={(e) => handleActiveNote(e)}>
+									onClick={(e) => handleActiveInformation(e)}>
 									<Box
 										overflow={"hidden"}
 										textOverflow={"ellipsis"}
@@ -355,38 +357,23 @@ export default function Notes() {
 					px={"20px"}
 					color={"gray.300"}
 					spacing={10}>
-					{Object.keys(activeNote).length ? (
+					{Object.keys(activeInformation).length ? (
 						<>
 							<Box display={"flex"}>
-								{/* {activeNote.done ? (
-									<Checkbox
-										isChecked
-										variant={"circular"}
-										colorScheme={"teal"}
-										size={"lg"}
-										mr={"15px"}
-										onChange={(e) => handleChangeCheckbox(e)}></Checkbox>
-								) : (
-									<Checkbox
-										variant={"circular"}
-										colorScheme={"teal"}
-										size={"lg"}
-										mr={"15px"}
-										onChange={(e) => handleChangeCheckbox(e)}></Checkbox>
-								)} */}
 								<Checkbox
+									isChecked={activeInformation.done}
 									variant={"circular"}
 									colorScheme={"teal"}
 									size={"lg"}
 									mr={"15px"}
-									onChange={(e) => handleChangeCheckbox(e)}></Checkbox>
+									onChange={handleChangeCheckbox}></Checkbox>
 								{isEditing.title ? (
 									<Input
 										id='title'
 										fontSize='3xl'
 										fontWeight={"bold"}
 										border={"none"}
-										value={activeNote.title}
+										value={activeInformation.title}
 										position={"relative"}
 										onChange={(e) => handleChangeEditingValue(e)}
 										zIndex={"popover"}
@@ -399,7 +386,7 @@ export default function Notes() {
 										display={"block"}
 										w={"100%"}
 										onClick={(e) => handleClickUpdateElement(e)}>
-										{activeNote.title}
+										{activeInformation.title}
 									</Text>
 								)}
 							</Box>
@@ -413,7 +400,7 @@ export default function Notes() {
 										position={"relative"}
 										zIndex={"popover"}
 										onChange={(e) => handleChangeEditingValue(e)}
-										value={activeNote.description}
+										value={activeInformation.description}
 									/>
 								) : (
 									<Text
@@ -421,7 +408,7 @@ export default function Notes() {
 										w={"100%"}
 										h={"calc(100vh - 200px)"}
 										onClick={(e) => handleClickUpdateElement(e)}>
-										{activeNote.description}
+										{activeInformation.description}
 									</Text>
 								)}
 							</Box>
@@ -445,17 +432,17 @@ export default function Notes() {
 					color={"gray.300"}
 					h={"100vh"}
 					overflow={"scroll"}>
-					{Object.keys(activeNote).length ? (
+					{Object.keys(activeInformation).length ? (
 						<Stack spacing={6}>
 							<SimpleGrid columns={2} spacingY={3}>
 								<p>作成日：</p>
-								<p>{activeNote.createdAt}</p>
+								<p>{activeInformation.createdAt}</p>
 								<p>最終更新日：</p>
 								<p>2023/4/10 23:54</p>
 							</SimpleGrid>
 							<TasksParts
 								isEditing={isEditing}
-								activeNote={activeNote}
+								activeInformation={activeInformation}
 								handleChangeEditingValue={handleChangeEditingValue}
 								handleClickUpdateElement={handleClickUpdateElement}
 								changeDateFormat={changeDateFormat}
