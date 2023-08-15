@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
-import { Box, Text, Button, Image } from "@chakra-ui/react";
-
+import { Box, Text, Button } from "@chakra-ui/react";
+import Image from "next/image";
 export default function Header() {
 	const menus = [
 		{
@@ -43,7 +43,7 @@ export default function Header() {
 			position={"fixed"}
 			zIndex={"banner"}>
 			<Box display='flex' alignItems={"center"}>
-				<Image h='25px' src='logo.png' alt='logo' />
+				<Image width={100} height={100} src={"/logo.png"} />
 				<Box display={"flex"} ml={"50px"}>
 					{menus.map((menu) => {
 						// TODO: 現在のパスを取得し、色を特定する。
