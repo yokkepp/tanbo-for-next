@@ -43,7 +43,7 @@ export default function Header() {
 			position={"fixed"}
 			zIndex={"banner"}>
 			<Box display='flex' alignItems={"center"}>
-				<Image width={100} height={100} src={"/logo.png"} />
+				<Image width={100} height={100} src={"/logo.png"} alt={"logo"} />
 				<Box display={"flex"} ml={"50px"}>
 					{menus.map((menu) => {
 						// TODO: 現在のパスを取得し、色を特定する。
