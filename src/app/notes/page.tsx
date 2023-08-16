@@ -1,12 +1,11 @@
 "use client";
 import { InformationsContextObject } from "../layout";
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import { Modal } from "@/components/Modal/Modal";
 import TasksParts from "@/components/TasksParts";
 import NotesParts from "@/components/NotesParts";
 import BoardsParts from "@/components/BoardsParts";
-import { BgMaskForInput } from "@/components/bgMaskForInput";
-import { Informations } from "../types";
+import { BgMaskForInput } from "@/components/BgMaskForInput";
 import {
 	Text,
 	Box,
@@ -17,7 +16,6 @@ import {
 	Input,
 	Textarea,
 } from "@chakra-ui/react";
-import { DeleteIcon } from "@chakra-ui/icons";
 import { db } from "../firebase";
 import {
 	collection,
@@ -26,6 +24,8 @@ import {
 	getDocs,
 	updateDoc,
 } from "firebase/firestore";
+import NoteLists from "@/components/NoteLists";
+import ActiveNote from "@/components/ActiveNote";
 
 //全てのプロパティの値をfalseにする
 const INITIAL_EDITING = {
@@ -264,89 +264,11 @@ export default function Notes() {
 						onClick={handleModalToggle}>
 						Noteを追加する
 					</Button>
-					{informations.map((info) => {
-						if (info.id === activeInformation.id) {
-							return (
-								<Button
-									key={info.id}
-									id={info.id}
-									justifyContent={"space-between"}
-									colorScheme={"orange"}
-									h={"50px"}
-									p={"10px"}
-									bg={"orangeAlpha.900"}
-									onClick={(e) => handleActiveInformation(e)}>
-									<Box
-										overflow={"hidden"}
-										textOverflow={"ellipsis"}
-										pointerEvents={"none"}
-										w={"100%"}
-										textAlign={"left"}>
-										{activeInformation.title}
-									</Box>
-
-									<Box
-										w={"35px"}
-										h={"35px"}
-										borderRadius={"5px"}
-										p={"5px"}
-										transition={"ease 0.2s"}
-										_hover={{
-											color: "orangeAlpha.900",
-											bg: "gray.200",
-										}}
-										onClick={(e) => handleDeleteList(e)}>
-										<DeleteIcon
-											alignItems={"center"}
-											justifyItems={"center"}
-											fontSize={"xl"}
-											pointerEvents={"none"}
-										/>
-									</Box>
-								</Button>
-							);
-						} else {
-							return (
-								<Button
-									key={info.id}
-									id={info.id}
-									justifyContent={"space-between"}
-									colorScheme={"orange"}
-									h={"50px"}
-									p={"10px"}
-									bg={"orangeAlpha.200"}
-									onClick={(e) => handleActiveInformation(e)}>
-									<Box
-										overflow={"hidden"}
-										textOverflow={"ellipsis"}
-										pointerEvents={"none"}
-										w={"100%"}
-										textAlign={"left"}>
-										{info.title}
-									</Box>
-
-									<Box
-										w={"35px"}
-										h={"35px"}
-										borderRadius={"5px"}
-										p={"5px"}
-										transition={"ease 0.2s"}
-										_hover={{
-											color: "orangeAlpha.900",
-											bg: "gray.200",
-										}}
-										onClick={(e) => handleDeleteList(e)}>
-										<DeleteIcon
-											alignItems={"center"}
-											justifyItems={"center"}
-											fontSize={"xl"}
-											pointerEvents={"none"}
-										/>
-									</Box>
-								</Button>
-							);
-						}
-					})}
+					<NoteLists
+						activeInformation={activeInformation}
+						handleDeleteList={handleDeleteList}
+						handleActiveInformation={handleActiveInformation}
+					/>
 				</Stack>
 				<Stack
 					w={"45%"}
@@ -357,71 +279,13 @@ export default function Notes() {
 					px={"20px"}
 					color={"gray.300"}
 					spacing={10}>
-					{Object.keys(activeInformation).length ? (
-						<>
-							<Box display={"flex"}>
-								<Checkbox
-									isChecked={activeInformation.done}
-									variant={"circular"}
-									colorScheme={"teal"}
-									size={"lg"}
-									mr={"15px"}
-									onChange={handleChangeCheckbox}></Checkbox>
-								{isEditing.title ? (
-									<Input
-										id='title'
-										fontSize='3xl'
-										fontWeight={"bold"}
-										border={"none"}
-										value={activeInformation.title}
-										position={"relative"}
-										onChange={(e) => handleChangeEditingValue(e)}
-										zIndex={"popover"}
-									/>
-								) : (
-									<Text
-										id='title'
-										fontSize='3xl'
-										fontWeight={"bold"}
-										display={"block"}
-										w={"100%"}
-										onClick={(e) => handleClickUpdateElement(e)}>
-										{activeInformation.title}
-									</Text>
-								)}
-							</Box>
-							<Box whiteSpace={"pre-wrap"}>
-								{isEditing.description ? (
-									<Textarea
-										id='description'
-										w={"100%"}
-										h={"calc(100vh - 200px)"}
-										resize={"none"}
-										position={"relative"}
-										zIndex={"popover"}
-										onChange={(e) => handleChangeEditingValue(e)}
-										value={activeInformation.description}
-									/>
-								) : (
-									<Text
-										id='description'
-										w={"100%"}
-										h={"calc(100vh - 200px)"}
-										onClick={(e) => handleClickUpdateElement(e)}>
-										{activeInformation.description}
-									</Text>
-								)}
-							</Box>
-						</>
-					) : (
-						<Box
-							display={"flex"}
-							h={"100vh"}
-							justifyContent={"center"}
-							alignItems={"center"}>
-							<Text>Noteが選択されていません。</Text>
-						</Box>
-					)}
+					<ActiveNote
+						isEditing={isEditing}
+						activeInformation={activeInformation}
+						handleChangeCheckbox={handleChangeCheckbox}
+						handleClickUpdateElement={handleClickUpdateElement}
+						handleChangeEditingValue={handleChangeEditingValue}
+					/>
 				</Stack>
 				<Stack
 					w={"30%"}
@@ -450,9 +314,7 @@ export default function Notes() {
 							<NotesParts />
 							<BoardsParts />
 						</Stack>
-					) : (
-						<></>
-					)}
+					) : null}
 				</Stack>
 			</Box>
 		</>
