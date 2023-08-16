@@ -4,6 +4,7 @@ export type CommonInformation = {
 };
 
 export type TasksInformation = {
+	done: boolean;
 	completedAt: string;
 	timeLimit: string;
 	planStart: string;

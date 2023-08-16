@@ -1,10 +1,11 @@
 "use client";
-import Header from "@/components/Header/Header";
+import { InformationsContextObject } from "../layout";
+import { useState, useContext } from "react";
 import { Modal } from "@/components/Modal/Modal";
 import TasksParts from "@/components/TasksParts";
 import NotesParts from "@/components/NotesParts";
 import BoardsParts from "@/components/BoardsParts";
-
+import { BgMaskForInput } from "@/components/BgMaskForInput";
 import {
 	Text,
 	Box,
@@ -15,11 +16,7 @@ import {
 	Input,
 	Textarea,
 } from "@chakra-ui/react";
-import { useState, useEffect } from "react";
-import { DeleteIcon } from "@chakra-ui/icons";
-import { BgMaskForInput } from "@/components/bgMaskForInput";
 import { db } from "../firebase";
-
 import {
 	collection,
 	deleteDoc,
@@ -27,49 +24,8 @@ import {
 	getDocs,
 	updateDoc,
 } from "firebase/firestore";
-
-//あらかじめ設定するNoteデータ
-const INITIAL_DATA = [
-	{
-		title: "タイトル1",
-		description: "詳細1",
-		completedAt: "",
-		timeLimit: "",
-		planStart: "",
-		planEnd: "",
-		progress: "",
-		notesArchive: "",
-		boardName: "",
-		boardStatus: "",
-		boardsArchive: "",
-	},
-	{
-		title: "タイトル2",
-		description: "詳細2",
-		completedAt: "",
-		timeLimit: "",
-		planStart: "",
-		planEnd: "",
-		progress: "",
-		notesArchive: "",
-		boardName: "",
-		boardStatus: "",
-		boardsArchive: "",
-	},
-	{
-		title: "タイトル3",
-		description: "詳細3",
-		completedAt: "",
-		timeLimit: "",
-		planStart: "",
-		planEnd: "",
-		progress: "",
-		notesArchive: "",
-		boardName: "",
-		boardStatus: "",
-		boardsArchive: "",
-	},
-];
+import NoteLists from "@/components/NoteLists";
+import ActiveNote from "@/components/ActiveNote";
 
 //全てのプロパティの値をfalseにする
 const INITIAL_EDITING = {
@@ -97,55 +53,40 @@ export default function Notes() {
 	//編集中のプロパティ名を管理します。（title, descriptionなど）
 	const [editingElement, setEditingElement] = useState("");
 
-	//Tasksコンポーネントの状態を管理します。
-	const [tasksState, setTasksState] = useState({
-		completedAt: "",
-		timeLimit: "",
-		planStart: "",
-		planEnd: "",
-		progress: 0,
-	});
-	//Notesコンポーネントの状態を管理します。
-	const [notesState, setNotesState] = useState({
-		notesArchive: true,
-	});
-	//Boardsコンポーネントの状態を管理します。
-	const [boardsState, setBoardsState] = useState({
-		boardName: "",
-		boardStatus: "",
-		boardsArchive: true,
-	});
-	//表示されるNoteを管理します。
-	const [activeNote, setActiveNote] = useState({});
+	// //Tasksコンポーネントの状態を管理します。
+	// const [tasksState, setTasksState] = useState({
+	// 	done: false,
+	// 	completedAt: "",
+	// 	timeLimit: "",
+	// 	planStart: "",
+	// 	planEnd: "",
+	// 	progress: 0,
+	// });
+	// //Notesコンポーネントの状態を管理します。
+	// const [notesState, setNotesState] = useState({
+	// 	notesArchive: true,
+	// });
+	// //Boardsコンポーネントの状態を管理します。
+	// const [boardsState, setBoardsState] = useState({
+	// 	boardName: "",
+	// 	boardStatus: "",
+	// 	boardsArchive: true,
+	// });
 
-	//Noteの全データを管理します。
-	const [informations, setInformations] = useState([{}]);
+	//1つのデータを管理します。
+	const [activeInformation, setActiveInformation] = useState({});
 
-	//1つのNoteのデータを管理します。
-	const [information, setInformation] = useState({});
-
-	//レンダリング時にfirebaseからデータを読み込む。
-	useEffect(() => {
-		const getDataForfirestore = async () => {
-			const querySnapshot = await getDocs(collection(db, "informations"));
-			const INITIAL_DATA_FOR_FIRESTORE = [];
-			querySnapshot.forEach((doc) => {
-				INITIAL_DATA_FOR_FIRESTORE.push({ ...doc.data(), id: doc.id });
-			});
-			setInformations(INITIAL_DATA_FOR_FIRESTORE);
-		};
-		getDataForfirestore();
-	}, []);
-	//TODO: 通信環境によって、取得できない時がある。失敗時と成功時の処理を各必要がありそう？
+	//全てのデータを管理します。
+	const { informations, setInformations } = useContext(
+		InformationsContextObject
+	);
 
 	/**
 	 *モーダル内部の
 	 * @param e イベントです。
 	 */
 	const handleChangeInformation = (e, name) => {
-		e.preventDefault();
-		console.log(e);
-		setInformation((prev) => ({ ...prev, [name]: e.target.value }));
+		setActiveInformation((prev) => ({ ...prev, [name]: e.target.value }));
 	};
 
 	/**
@@ -177,7 +118,7 @@ export default function Notes() {
 			const id = e.target.parentElement.id;
 			const newArray = informations.filter((info) => info.id !== id);
 			setInformations(newArray);
-			setActiveNote({});
+			setActiveInformation({});
 			deleteDoc(doc(db, "informations", id));
 		} else {
 			alert("キャンセルしました。");
@@ -189,18 +130,18 @@ export default function Notes() {
 	 */
 	const updateSubmit = async () => {
 		//firebaseの更新対象を選択する。
-		const updateRef = doc(db, "informations", activeNote.id);
+		const updateRef = doc(db, "informations", activeInformation.id);
 
 		//updateするときは、idは不要なので、削除したものをupdateする
-		const updateInformation = { ...activeNote };
+		const updateInformation = { ...activeInformation };
 		delete updateInformation.id;
 		await updateDoc(updateRef, updateInformation);
 
 		//informationsを更新してローカルを最新状態にする。
-		setInformations((prevInformations) =>
-			prevInformations.map((info) => {
-				if (info.id === activeNote.id) {
-					return activeNote;
+		setInformations((prev) =>
+			prev.map((info) => {
+				if (info.id === activeInformation.id) {
+					return activeInformation;
 				} else {
 					return info;
 				}
@@ -231,36 +172,64 @@ export default function Notes() {
 	 * アクティブ表示されるinformationを選択する関数です。
 	 * @param e イベントです。
 	 */
-	const handleActiveNote = (e) => {
-		e.preventDefault();
-		const newActiveNoteArray = informations.filter(
+	const handleActiveInformation = (e) => {
+		const newActiveInformationArray = informations.filter(
 			(info) => info.id === e.target.id
 		);
 
-		const newActiveNote: {} = newActiveNoteArray[0];
-		setActiveNote(newActiveNote);
+		const newActiveInformation: {} = newActiveInformationArray[0];
+		setActiveInformation(newActiveInformation);
 	};
 
 	/**編集したい要素を押下した時に発火する関数です。
 	 *@param e イベントです。
 	 */
 	const handleChangeEditingValue = (e: any) => {
-		setActiveNote((prev) => ({ ...prev, [editingElement]: e.target.value }));
+		setActiveInformation((prev) => ({
+			...prev,
+			[editingElement]: e.target.value,
+		}));
 	};
 
-	useEffect(() => {
-		console.log(activeNote);
-		console.log("informations:", informations);
-	}, [activeNote, informations]);
+	//PROB:一つのinformationに対して、activeInformation, informations, firebaseのDBの3つを更新している。冗長になっている気がするが他の方法が知りたい。
+	const handleChangeCheckbox = async () => {
+		//ローカルのdoneを更新する
+		setActiveInformation((prev) => ({
+			...prev,
+			done: !activeInformation.done,
+		}));
+
+		const newInformations = [...informations];
+		setInformations(
+			newInformations.map((info) => {
+				if (info.id === activeInformation.id) {
+					return { ...activeInformation, done: !activeInformation.done };
+				} else {
+					return info;
+				}
+			})
+		);
+
+		//firebaseのdoneを更新する
+		//firebaseの更新対象を選択する。
+		const updateRef = doc(db, "informations", activeInformation.id);
+
+		//updateするときは、idは不要なので、削除したものをupdateする
+		const updateInformation = {
+			...activeInformation,
+			done: !activeInformation.done,
+		};
+		delete updateInformation.id;
+		await updateDoc(updateRef, updateInformation);
+	};
 
 	return (
 		<>
-			<Header />
 			{isModalOpen ? (
 				<Modal
 					handleModalToggle={handleModalToggle}
-					information={information}
-					setInformation={setInformation}
+					activeInformation={activeInformation}
+					setActiveInformation={setActiveInformation}
 					informations={informations}
 					setInformations={setInformations}
 					isEditing={isEditing}
@@ -295,90 +264,11 @@ export default function Notes() {
 						onClick={handleModalToggle}>
 						Noteを追加する
 					</Button>
-					{/* TODO:setInformationsをチェックして、idが必ず設定されるか確認する！ */}
-					{informations.map((info, index) => {
-						if (info.id === activeNote.id) {
-							return (
-								<Button
-									key={info.id}
-									id={info.id}
-									justifyContent={"space-between"}
-									colorScheme={"orange"}
-									h={"50px"}
-									p={"10px"}
-									bg={"orangeAlpha.900"}
-									onClick={(e) => handleActiveNote(e)}>
-									<Box
-										overflow={"hidden"}
-										textOverflow={"ellipsis"}
-										pointerEvents={"none"}
-										w={"100%"}
-										textAlign={"left"}>
-										{activeNote.title}
-									</Box>
-
-									<Box
-										w={"35px"}
-										h={"35px"}
-										borderRadius={"5px"}
-										p={"5px"}
-										transition={"ease 0.2s"}
-										_hover={{
-											color: "orangeAlpha.900",
-											bg: "gray.200",
-										}}
-										onClick={(e) => handleDeleteList(e)}>
-										<DeleteIcon
-											alignItems={"center"}
-											justifyItems={"center"}
-											fontSize={"xl"}
-											pointerEvents={"none"}
-										/>
-									</Box>
-								</Button>
-							);
-						} else {
-							return (
-								<Button
-									key={info.id}
-									id={info.id}
-									justifyContent={"space-between"}
-									colorScheme={"orange"}
-									h={"50px"}
-									p={"10px"}
-									bg={"orangeAlpha.200"}
-									onClick={(e) => handleActiveNote(e)}>
-									<Box
-										overflow={"hidden"}
-										textOverflow={"ellipsis"}
-										pointerEvents={"none"}
-										w={"100%"}
-										textAlign={"left"}>
-										{info.title}
-									</Box>
-
-									<Box
-										w={"35px"}
-										h={"35px"}
-										borderRadius={"5px"}
-										p={"5px"}
-										transition={"ease 0.2s"}
-										_hover={{
-											color: "orangeAlpha.900",
-											bg: "gray.200",
-										}}
-										onClick={(e) => handleDeleteList(e)}>
-										<DeleteIcon
-											alignItems={"center"}
-											justifyItems={"center"}
-											fontSize={"xl"}
-											pointerEvents={"none"}
-										/>
-									</Box>
-								</Button>
-							);
-						}
-					})}
+					<NoteLists
+						activeInformation={activeInformation}
+						handleDeleteList={handleDeleteList}
+						handleActiveInformation={handleActiveInformation}
+					/>
 				</Stack>
 				<Stack
 					w={"45%"}
@@ -389,65 +279,13 @@ export default function Notes() {
 					px={"20px"}
 					color={"gray.300"}
 					spacing={10}>
-					{Object.keys(activeNote).length ? (
-						<>
-							<Box display={"flex"}>
-								<Checkbox colorScheme='teal' size={"lg"} mr={"15px"}></Checkbox>
-								{isEditing.title ? (
-									<Input
-										id='title'
-										fontSize='3xl'
-										fontWeight={"bold"}
-										border={"none"}
-										value={activeNote.title}
-										position={"relative"}
-										onChange={(e) => handleChangeEditingValue(e)}
-										zIndex={"popover"}
-									/>
-								) : (
-									<Text
-										id='title'
-										fontSize='3xl'
-										fontWeight={"bold"}
-										display={"block"}
-										w={"100%"}
-										onClick={(e) => handleClickUpdateElement(e)}>
-										{activeNote.title}
-									</Text>
-								)}
-							</Box>
-							<Box whiteSpace={"pre-wrap"}>
-								{isEditing.description ? (
-									<Textarea
-										id='description'
-										w={"100%"}
-										h={"calc(100vh - 200px)"}
-										resize={"none"}
-										position={"relative"}
-										zIndex={"popover"}
-										onChange={(e) => handleChangeEditingValue(e)}
-										value={activeNote.description}
-									/>
-								) : (
-									<Text
-										id='description'
-										w={"100%"}
-										h={"calc(100vh - 200px)"}
-										onClick={(e) => handleClickUpdateElement(e)}>
-										{activeNote.description}
-									</Text>
-								)}
-							</Box>
-						</>
-					) : (
-						<Box
-							display={"flex"}
-							h={"100vh"}
-							justifyContent={"center"}
-							alignItems={"center"}>
-							<Text>Noteが選択されていません。</Text>
-						</Box>
-					)}
+					<ActiveNote
+						isEditing={isEditing}
+						activeInformation={activeInformation}
+						handleChangeCheckbox={handleChangeCheckbox}
+						handleClickUpdateElement={handleClickUpdateElement}
+						handleChangeEditingValue={handleChangeEditingValue}
+					/>
 				</Stack>
 				<Stack
 					w={"30%"}
@@ -458,17 +296,17 @@ export default function Notes() {
 					color={"gray.300"}
 					h={"100vh"}
 					overflow={"scroll"}>
-					{Object.keys(activeNote).length ? (
+					{Object.keys(activeInformation).length ? (
 						<Stack spacing={6}>
 							<SimpleGrid columns={2} spacingY={3}>
 								<p>作成日：</p>
-								<p>{activeNote.createdAt}</p>
+								<p>{activeInformation.createdAt}</p>
 								<p>最終更新日：</p>
 								<p>2023/4/10 23:54</p>
 							</SimpleGrid>
 							<TasksParts
 								isEditing={isEditing}
-								activeNote={activeNote}
+								activeInformation={activeInformation}
 								handleChangeEditingValue={handleChangeEditingValue}
 								handleClickUpdateElement={handleClickUpdateElement}
 								changeDateFormat={changeDateFormat}
@@ -476,9 +314,7 @@ export default function Notes() {
 							<NotesParts />
 							<BoardsParts />
 						</Stack>
-					) : (
-						<></>
-					)}
+					) : null}
 				</Stack>
 			</Box>
 		</>

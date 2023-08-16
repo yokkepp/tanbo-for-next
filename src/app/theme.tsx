@@ -1,7 +1,6 @@
 // theme.ts (tsx file with usage of StyleFunctions, see 4.)
 import { extendTheme } from "@chakra-ui/react";
-import type { StyleFunctionProps } from "@chakra-ui/styled-system";
-
+import { checkboxTheme } from "./checkboxTheme";
 const theme = extendTheme({
 	colors: {
 		black: {
@@ -56,6 +55,7 @@ const theme = extendTheme({
 				fontWeight: "Normally", // Normally, it is "semibold"
 			},
 		},
+		Checkbox: checkboxTheme,
 	},
 });
 
