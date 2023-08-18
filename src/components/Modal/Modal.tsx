@@ -14,7 +14,8 @@ import { db } from "@/app/firebase";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import NotesParts from "../NotesParts";
 import BoardsParts from "../BoardsParts";
-export function Modal(props) {
+import { LocalInformation } from "@/app/types";
+export function Modal(props: any) {
 	const {
 		handleModalToggle,
 		setActiveInformation,
@@ -26,7 +27,7 @@ export function Modal(props) {
 		changeDateFormat,
 	} = props;
 
-	const inputEl = useRef<HTMLElement>(null);
+	const inputEl = useRef<HTMLInputElement>(null);
 	const [addingInformation, setAddingInformation] = useState({});
 
 	/**
@@ -52,7 +53,7 @@ export function Modal(props) {
 			...activeInformation,
 			createdAt: nowInDB,
 		});
-		setInformations((prev) => [
+		setInformations((prev: LocalInformation[]) => [
 			...prev,
 			{ ...activeInformation, createdAt: now, id: docRef.id },
 		]);

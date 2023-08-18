@@ -16,7 +16,7 @@ import {
 	Checkbox,
 } from "@chakra-ui/react";
 import { CopyIcon, DeleteIcon } from "@chakra-ui/icons";
-import { useState, useContext } from "react";
+import { useState, useContext, SetStateAction } from "react";
 import { InformationsContextObject } from "../layout";
 import SearchConditionButtons from "../../components/SearchConditionButtons";
 
@@ -32,7 +32,7 @@ export default function Tasks() {
 	//TODO: useState localInformationsを用意して、informationsをまとめて表示する時も表示形式を変更しておく必要がある。
 	//TODO: 検索機能を実装する必要がある。ソート機能を作成して、doneList notDoneListを作成して、それぞれに格納→表示する。
 
-	const handleChangeQuickTitle = (e) => {
+	const handleChangeQuickTitle = (e: any) => {
 		setQuickTitle(e.target.value);
 	};
 	return (
@@ -76,7 +76,7 @@ export default function Tasks() {
 											</Tr>
 										</Thead>
 										<Tbody>
-											{informations.map((info) => {
+											{informations.map((info: any) => {
 												return (
 													<Tr key={info.id} id={info.id}>
 														<Td textColor={"white"}>
@@ -137,7 +137,7 @@ export default function Tasks() {
 											</Tr>
 										</Thead>
 										<Tbody>
-											{informations.map((info) => {
+											{informations.map((info: any) => {
 												return (
 													<Tr key={info.id} id={info.id}>
 														<Td textColor={"white"}>

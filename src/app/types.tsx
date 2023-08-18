@@ -1,4 +1,13 @@
-export type CommonInformation = {
+export type LocalCommonInformation = {
+	id: string;
+	createdAt: string;
+	title: string;
+	description: string;
+};
+
+export type FirebaseCommonInformation = {
+	id?: string;
+	createdAt: string;
 	title: string;
 	description: string;
 };
@@ -22,7 +31,12 @@ export type BoardsInformation = {
 	boardsArchive: boolean;
 };
 
-export type Informations = CommonInformation &
+export type LocalInformation = LocalCommonInformation &
+	TasksInformation &
+	NotesInformation &
+	BoardsInformation;
+
+export type FirebaseInformation = FirebaseCommonInformation &
 	TasksInformation &
 	NotesInformation &
 	BoardsInformation;

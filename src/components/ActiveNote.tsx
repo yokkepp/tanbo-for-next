@@ -1,7 +1,33 @@
+import { LocalInformation } from "@/app/types";
 import { Box, Checkbox, Input, Text, Textarea } from "@chakra-ui/react";
 import React from "react";
+import { INITIAL_EDITING } from "@/app/notes/page";
+type Props = {
+	isEditing: {
+		title: boolean;
+		description: boolean;
+		completedAt: boolean;
+		timeLimit: boolean;
+		planStart: boolean;
+		planEnd: boolean;
+		progress: boolean;
+		notesArchive: boolean;
+		boardName: boolean;
+		boardStatus: boolean;
+		boardsArchive: boolean;
+		all: boolean;
+	};
+	activeInformation: LocalInformation;
+	handleChangeCheckbox: () => Promise<void>;
+	handleClickUpdateElement: any;
+	handleChangeEditingValue: (e: {
+		target: {
+			value: string | number;
+		};
+	}) => void;
+};
 
-function ActiveNote(props) {
+function ActiveNote(props: Props) {
 	const {
 		isEditing,
 		activeInformation,
