@@ -10,20 +10,28 @@ import {
 	getDocs,
 	updateDoc,
 } from "firebase/firestore";
-export const InformationsContextObject = createContext({});
+import { LocalInformation, FirebaseInformation } from "./types";
+export const InformationsContextObject = createContext<
+	StateContextType | undefined
+>(undefined);
+
+interface StateContextType {
+	informations: FirebaseInformation[];
+	setInformations: React.Dispatch<React.SetStateAction<never[]>>;
+}
 
 export default function RootLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
-	const [informations, setInformations] = useState([{ name: "", age: {} }]);
+	const [informations, setInformations] = useState([]);
 
 	//レンダリング時にfirebaseからデータを読み込む。
 	useEffect(() => {
 		const infoData = collection(db, "informations");
 		getDocs(infoData).then((result) => {
-			const INITIAL_DATA = [];
+			const INITIAL_DATA: any = [];
 			result.forEach((doc) => {
 				INITIAL_DATA.push({ ...doc.data(), id: doc.id });
 			});

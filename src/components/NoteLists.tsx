@@ -5,19 +5,20 @@ import { Box, Button } from "@chakra-ui/react";
 import React, { useContext } from "react";
 
 function NoteLists(props) {
-	const { activeInformation, handleDeleteList, handleActiveInformation } =
-		props;
 	//全てのデータを管理します。
 	const { informations, setInformations } = useContext(
 		InformationsContextObject
 	);
+	const { activeInformation, handleDeleteList, handleActiveInformation } =
+		props;
 	return (
 		<>
-			{informations.map((info) => {
+			{informations.map((info, index) => {
 				if (info.id === activeInformation.id) {
 					return (
 						<Button
-							key={info.id}
+							key={index}
+							// key={info.id}
 							id={info.id}
 							justifyContent={"space-between"}
 							colorScheme={"orange"}
@@ -57,7 +58,8 @@ function NoteLists(props) {
 				} else {
 					return (
 						<Button
-							key={info.id}
+							key={index}
+							// key={info.id}
 							id={info.id}
 							justifyContent={"space-between"}
 							colorScheme={"orange"}

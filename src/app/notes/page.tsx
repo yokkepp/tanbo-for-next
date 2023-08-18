@@ -1,6 +1,6 @@
 "use client";
 import { InformationsContextObject } from "../layout";
-import { useState, useContext } from "react";
+import { useState, useContext, SetStateAction } from "react";
 import { Modal } from "@/components/Modal/Modal";
 import TasksParts from "@/components/TasksParts";
 import NotesParts from "@/components/NotesParts";
@@ -26,9 +26,10 @@ import {
 } from "firebase/firestore";
 import NoteLists from "@/components/NoteLists";
 import ActiveNote from "@/components/ActiveNote";
+import { LocalInformation, FirebaseInformation } from "../types";
 
 //全てのプロパティの値をfalseにする
-const INITIAL_EDITING = {
+export const INITIAL_EDITING = {
 	title: false,
 	description: false,
 	completedAt: false,
@@ -43,6 +44,23 @@ const INITIAL_EDITING = {
 	all: false,
 };
 
+const INITIAL_INFORMATION = {
+	id: "",
+	createdAt: "",
+	title: "",
+	description: "",
+	done: false,
+	completedAt: "",
+	timeLimit: "",
+	planStart: "",
+	planEnd: "",
+	progress: 0,
+	notesArchive: false,
+	boardName: "",
+	boardStatus: "",
+	boardsArchive: false,
+};
+
 export default function Notes() {
 	//新しいNoteを追加する時のモーダルの表示状態を管理します。
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -53,31 +71,12 @@ export default function Notes() {
 	//編集中のプロパティ名を管理します。（title, descriptionなど）
 	const [editingElement, setEditingElement] = useState("");
 
-	// //Tasksコンポーネントの状態を管理します。
-	// const [tasksState, setTasksState] = useState({
-	// 	done: false,
-	// 	completedAt: "",
-	// 	timeLimit: "",
-	// 	planStart: "",
-	// 	planEnd: "",
-	// 	progress: 0,
-	// });
-	// //Notesコンポーネントの状態を管理します。
-	// const [notesState, setNotesState] = useState({
-	// 	notesArchive: true,
-	// });
-	// //Boardsコンポーネントの状態を管理します。
-	// const [boardsState, setBoardsState] = useState({
-	// 	boardName: "",
-	// 	boardStatus: "",
-	// 	boardsArchive: true,
-	// });
-
 	//1つのデータを管理します。
-	const [activeInformation, setActiveInformation] = useState({});
+	const [activeInformation, setActiveInformation] =
+		useState<LocalInformation>(INITIAL_INFORMATION);
 
 	//全てのデータを管理します。
-	const { informations, setInformations } = useContext(
+	const { informations, setInformations } = useContext<any>(
 		InformationsContextObject
 	);
 
@@ -85,7 +84,10 @@ export default function Notes() {
 	 *モーダル内部の
 	 * @param e イベントです。
 	 */
-	const handleChangeInformation = (e, name) => {
+	const handleChangeInformation = (
+		e: { target: HTMLButtonElement },
+		name: string
+	) => {
 		setActiveInformation((prev) => ({ ...prev, [name]: e.target.value }));
 	};
 
@@ -93,7 +95,7 @@ export default function Notes() {
 	 *クリックされた要素だけを編集中のステータスに変更するための関数です。
 	 * @param e イベントです。
 	 */
-	const handleClickUpdateElement = async (e) => {
+	const handleClickUpdateElement = async (e: { target: { id: string } }) => {
 		//対象のidに設定されたプロパティ名を取得する。
 		setEditingElement(e.target.id);
 		//一度初期化し、クリックされた要素だけを編集中のステータスに変更する
@@ -112,13 +114,16 @@ export default function Notes() {
 	 * informationsから任意のinformationを削除する関数です。
 	 * @param e イベントです。
 	 */
-	const handleDeleteList = (e: any) => {
-		e.stopPropagation();
+	const handleDeleteList = (e: {
+		target: { parentElement: { id: string } };
+	}) => {
 		if (confirm("本当に削除しますか？")) {
-			const id = e.target.parentElement.id;
-			const newArray = informations.filter((info) => info.id !== id);
+			const id: string = e.target.parentElement.id;
+			const newArray = informations.filter(
+				(info: LocalInformation) => info.id !== id
+			);
 			setInformations(newArray);
-			setActiveInformation({});
+			// setActiveInformation(INITIAL_INFORMATION);
 			deleteDoc(doc(db, "informations", id));
 		} else {
 			alert("キャンセルしました。");
@@ -128,18 +133,18 @@ export default function Notes() {
 	/**
 	 * 編集中以外の要素を押下することで、isEditingを初期化し、値を更新する関数です。
 	 */
-	const updateSubmit = async () => {
+	const updateSubmit: any = async () => {
 		//firebaseの更新対象を選択する。
 		const updateRef = doc(db, "informations", activeInformation.id);
 
 		//updateするときは、idは不要なので、削除したものをupdateする
-		const updateInformation = { ...activeInformation };
+		const updateInformation: FirebaseInformation = { ...activeInformation };
 		delete updateInformation.id;
 		await updateDoc(updateRef, updateInformation);
 
 		//informationsを更新してローカルを最新状態にする。
-		setInformations((prev) =>
-			prev.map((info) => {
+		setInformations((prev: any) =>
+			prev.map((info: any) => {
 				if (info.id === activeInformation.id) {
 					return activeInformation;
 				} else {
@@ -155,7 +160,7 @@ export default function Notes() {
 	 * 日時の情報を受け取り、表示したいフォーマットにして返却する関数です。（2023-08-03T14:30 → 2023/08/03 14:30）
 	 * @param date string型の日時データです。（2023-08-03T14:30 ）
 	 */
-	const changeDateFormat = (date) => {
+	const changeDateFormat = (date: string) => {
 		const newDate = new Date(date);
 		const year = newDate.getFullYear();
 		const month = (newDate.getMonth() + 1).toString().padStart(2, "0");
@@ -172,19 +177,21 @@ export default function Notes() {
 	 * アクティブ表示されるinformationを選択する関数です。
 	 * @param e イベントです。
 	 */
-	const handleActiveInformation = (e) => {
+	const handleActiveInformation = (e: { target: { id: string } }) => {
 		const newActiveInformationArray = informations.filter(
-			(info) => info.id === e.target.id
+			(info: LocalInformation) => info.id === e.target.id
 		);
 
-		const newActiveInformation: {} = newActiveInformationArray[0];
+		const newActiveInformation: LocalInformation = newActiveInformationArray[0];
 		setActiveInformation(newActiveInformation);
 	};
 
 	/**編集したい要素を押下した時に発火する関数です。
 	 *@param e イベントです。
 	 */
-	const handleChangeEditingValue = (e: any) => {
+	const handleChangeEditingValue = (e: {
+		target: { value: string | number };
+	}) => {
 		setActiveInformation((prev) => ({
 			...prev,
 			[editingElement]: e.target.value,
@@ -215,7 +222,7 @@ export default function Notes() {
 		const updateRef = doc(db, "informations", activeInformation.id);
 
 		//updateするときは、idは不要なので、削除したものをupdateする
-		const updateInformation = {
+		const updateInformation: FirebaseInformation = {
 			...activeInformation,
 			done: !activeInformation.done,
 		};
