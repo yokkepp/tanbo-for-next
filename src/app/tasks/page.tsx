@@ -21,9 +21,7 @@ import { InformationsContextObject } from "../layout";
 import SearchConditionButtons from "../../components/SearchConditionButtons";
 
 export default function Tasks() {
-	const { informations, setInformations } = useContext(
-		InformationsContextObject
-	);
+	const { informations } = useContext(InformationsContextObject);
 	const [doneList, setDoneList] = useState([]);
 	const [notDoneList, setNotDoneList] = useState([]);
 	const [localInformations, setLocalInformations] = useState([]);
@@ -35,6 +33,7 @@ export default function Tasks() {
 	const handleChangeQuickTitle = (e: any) => {
 		setQuickTitle(e.target.value);
 	};
+
 	return (
 		<>
 			<Box w={"100%"} h={"100vh"} pt={"70px"} bg={"gray.900"} px={"20px"}>
@@ -81,9 +80,11 @@ export default function Tasks() {
 													<Tr key={info.id} id={info.id}>
 														<Td textColor={"white"}>
 															<Checkbox
+																isChecked={info.done}
 																colorScheme='teal'
 																variant={"circular"}
-																size={"lg"}></Checkbox>
+																size={"lg"}
+																onChange={() => alert("Hello")}></Checkbox>
 														</Td>
 														<Td textColor={"white"}>{info.createdAt}</Td>
 														<Td textColor={"white"}>{info.title}</Td>

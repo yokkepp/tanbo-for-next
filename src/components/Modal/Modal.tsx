@@ -1,6 +1,6 @@
 "use client";
 import { CloseIcon } from "@chakra-ui/icons";
-import { useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import {
 	Box,
 	Button,
@@ -14,6 +14,7 @@ import { db } from "@/app/firebase";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import NotesParts from "../NotesParts";
 import BoardsParts from "../BoardsParts";
+import { INITIAL_INFORMATION } from "@/app/notes/page";
 import { LocalInformation } from "@/app/types";
 export function Modal(props: any) {
 	const {
@@ -28,8 +29,15 @@ export function Modal(props: any) {
 	} = props;
 
 	const inputEl = useRef<HTMLInputElement>(null);
-	const [addingInformation, setAddingInformation] = useState({});
+	const [addingInformation, setAddingInformation] =
+		useState(INITIAL_INFORMATION);
 
+	const handleChangeAddingInformation = (
+		e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLTextAreaElement>,
+		prop: string
+	) => {
+		setAddingInformation((prev) => ({ ...prev, [prop]: e.target.value }));
+	};
 	/**
 	 * モーダル出現時に件名に自動的にフォーカスを当てる
 	 */
@@ -55,9 +63,8 @@ export function Modal(props: any) {
 		});
 		setInformations((prev: LocalInformation[]) => [
 			...prev,
-			{ ...activeInformation, createdAt: now, id: docRef.id },
+			{ ...addingInformation, createdAt: now, id: docRef.id },
 		]);
-		setActiveInformation({});
 		handleModalToggle();
 	};
 
@@ -93,8 +100,8 @@ export function Modal(props: any) {
 							placeholder='件名を入力してください'
 							bg={"gray.700"}
 							border={"none"}
-							value={activeInformation.title}
-							onChange={(e) => handleChangeInformation(e, "title")}
+							value={addingInformation.title}
+							onChange={(e) => handleChangeAddingInformation(e, "title")}
 							ref={inputEl}
 						/>
 					</Box>
@@ -102,12 +109,12 @@ export function Modal(props: any) {
 						w={"100%"}
 						h={"100%"}
 						bg={"gray.700"}
-						value={activeInformation.description}
+						value={addingInformation.description}
 						border={"none"}
 						resize={"none"}
 						placeholder='詳細を入力してください'
 						onChange={(e) =>
-							handleChangeInformation(e, "description")
+							handleChangeAddingInformation(e, "description")
 						}></Textarea>
 					<Button
 						h={"100px"}
@@ -154,8 +161,8 @@ export function Modal(props: any) {
 								position={"relative"}
 								zIndex={"popover"}
 								placeholder='w'
-								onChange={(e) => handleChangeInformation(e, "timeLimit")}
-								value={activeInformation.timeLimit}
+								onChange={(e) => handleChangeAddingInformation(e, "timeLimit")}
+								value={addingInformation.timeLimit}
 							/>
 							<Box
 								p={"10px"}
@@ -178,8 +185,8 @@ export function Modal(props: any) {
 								position={"relative"}
 								zIndex={"popover"}
 								placeholder='w'
-								onChange={(e) => handleChangeInformation(e, "planStart")}
-								value={activeInformation.planStart}
+								onChange={(e) => handleChangeAddingInformation(e, "planStart")}
+								value={addingInformation.planStart}
 							/>
 
 							<Box
@@ -204,8 +211,8 @@ export function Modal(props: any) {
 								zIndex={"popover"}
 								placeholder='w'
 								h={"100%"}
-								onChange={(e) => handleChangeInformation(e, "planEnd")}
-								value={activeInformation.planEnd}
+								onChange={(e) => handleChangeAddingInformation(e, "planEnd")}
+								value={addingInformation.planEnd}
 							/>
 
 							<Box
