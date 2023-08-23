@@ -4,16 +4,16 @@ import { DeleteIcon } from "@chakra-ui/icons";
 import { Box, Button } from "@chakra-ui/react";
 import React, { useContext } from "react";
 
-function NoteLists(props) {
+function NoteLists(props: any) {
 	//全てのデータを管理します。
-	const { informations, setInformations } = useContext(
+	const { informations, setInformations }: any = useContext(
 		InformationsContextObject
 	);
 	const { activeInformation, handleDeleteList, handleActiveInformation } =
 		props;
 	return (
 		<>
-			{informations.map((info, index) => {
+			{informations.map((info: any, index: number) => {
 				if (info.id === activeInformation.id) {
 					return (
 						<Button

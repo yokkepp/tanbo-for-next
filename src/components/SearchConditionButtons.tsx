@@ -1,6 +1,6 @@
 import { Box, Button, Input } from "@chakra-ui/react";
 
-function SearchConditionButtons(props) {
+function SearchConditionButtons(props: any) {
 	const { quickTitle, handleChangeQuickTitle } = props;
 	return (
 		<Box display={"flex"} justifyContent={"space-between"}>
