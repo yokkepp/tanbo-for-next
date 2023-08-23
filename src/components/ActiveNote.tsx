@@ -37,7 +37,7 @@ function ActiveNote(props: Props) {
 	} = props;
 	return (
 		<>
-			{Object.keys(activeInformation).length ? (
+			{activeInformation.id !== "" ? (
 				<>
 					<Box display={"flex"}>
 						<Checkbox

@@ -44,7 +44,7 @@ export const INITIAL_EDITING = {
 	all: false,
 };
 
-const INITIAL_INFORMATION = {
+export const INITIAL_INFORMATION = {
 	id: "",
 	createdAt: "",
 	title: "",
@@ -114,16 +114,16 @@ export default function Notes() {
 	 * informationsから任意のinformationを削除する関数です。
 	 * @param e イベントです。
 	 */
-	const handleDeleteList = (e: {
+	const handleDeleteList = async (e: {
 		target: { parentElement: { id: string } };
 	}) => {
 		if (confirm("本当に削除しますか？")) {
 			const id: string = e.target.parentElement.id;
-			const newArray = informations.filter(
+			const newArray = await informations.filter(
 				(info: LocalInformation) => info.id !== id
 			);
 			setInformations(newArray);
-			// setActiveInformation(INITIAL_INFORMATION);
+			setActiveInformation(INITIAL_INFORMATION);
 			deleteDoc(doc(db, "informations", id));
 		} else {
 			alert("キャンセルしました。");
@@ -199,6 +199,9 @@ export default function Notes() {
 	};
 
 	//PROB:一つのinformationに対して、activeInformation, informations, firebaseのDBの3つを更新している。冗長になっている気がするが他の方法が知りたい。
+	/**
+	 * チェックボックスが変更された時に発火する関数です。
+	 */
 	const handleChangeCheckbox = async () => {
 		//ローカルのdoneを更新する
 		setActiveInformation((prev) => ({
@@ -294,16 +297,16 @@ export default function Notes() {
 						handleChangeEditingValue={handleChangeEditingValue}
 					/>
 				</Stack>
-				<Stack
-					w={"30%"}
-					bg={"gray.900"}
-					pt={"70px"}
-					pb={"50px"}
-					px={"20px"}
-					color={"gray.300"}
-					h={"100vh"}
-					overflow={"scroll"}>
-					{Object.keys(activeInformation).length ? (
+				{activeInformation.id !== "" ? (
+					<Stack
+						w={"30%"}
+						bg={"gray.900"}
+						pt={"70px"}
+						pb={"50px"}
+						px={"20px"}
+						color={"gray.300"}
+						h={"100vh"}
+						overflow={"scroll"}>
 						<Stack spacing={6}>
 							<SimpleGrid columns={2} spacingY={3}>
 								<p>作成日：</p>
@@ -321,8 +324,18 @@ export default function Notes() {
 							<NotesParts />
 							<BoardsParts />
 						</Stack>
-					) : null}
-				</Stack>
+					</Stack>
+				) : (
+					<Stack
+						w={"30%"}
+						bg={"gray.900"}
+						pt={"70px"}
+						pb={"50px"}
+						px={"20px"}
+						color={"gray.300"}
+						h={"100vh"}
+						overflow={"scroll"}></Stack>
+				)}
 			</Box>
 		</>
 	);
