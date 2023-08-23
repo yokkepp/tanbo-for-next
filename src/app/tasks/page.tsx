@@ -21,7 +21,7 @@ import { InformationsContextObject } from "../layout";
 import SearchConditionButtons from "../../components/SearchConditionButtons";
 
 export default function Tasks() {
-	const { informations } = useContext(InformationsContextObject);
+	const { informations }: any = useContext(InformationsContextObject);
 	const [doneList, setDoneList] = useState([]);
 	const [notDoneList, setNotDoneList] = useState([]);
 	const [localInformations, setLocalInformations] = useState([]);

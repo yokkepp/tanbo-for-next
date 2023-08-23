@@ -1,7 +1,7 @@
 import { LocalInformation } from "@/app/types";
 import { Box, Checkbox, Input, Text, Textarea } from "@chakra-ui/react";
 import React from "react";
-import { INITIAL_EDITING } from "@/app/notes/page";
+
 type Props = {
 	isEditing: {
 		title: boolean;

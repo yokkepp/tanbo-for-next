@@ -5,7 +5,7 @@ import { Box } from "@chakra-ui/react";
  * @param updateSubmit
  * @returns エレメントが返ります。
  */
-export const BgMaskForInput = ({ updateSubmit }) => {
+export const BgMaskForInput = ({ updateSubmit }: any) => {
 	return (
 		<Box
 			w={"100vw"}
