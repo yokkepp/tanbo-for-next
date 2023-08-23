@@ -5,7 +5,7 @@ import { Modal } from "@/components/Modal/Modal";
 import TasksParts from "@/components/TasksParts";
 import NotesParts from "@/components/NotesParts";
 import BoardsParts from "@/components/BoardsParts";
-import { BgMaskForInput } from "@/components/BgMaskForInput";
+import { BgMaskForInput } from "@/components/bgMaskForInput";
 import {
 	Text,
 	Box,
