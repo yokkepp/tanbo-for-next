@@ -14,8 +14,8 @@ import { db } from "@/app/firebase";
 import { addDoc, collection, doc, setDoc } from "firebase/firestore";
 import NotesParts from "../NotesParts";
 import BoardsParts from "../BoardsParts";
-import { INITIAL_INFORMATION } from "@/app/notes/page";
 import { LocalInformation } from "@/app/types";
+import { INITIAL_INFORMATION } from "@/config/initial";
 export function Modal(props: any) {
 	const {
 		handleModalToggle,
