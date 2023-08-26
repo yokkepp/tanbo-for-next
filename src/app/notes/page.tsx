@@ -154,7 +154,6 @@ export default function Notes() {
 	 */
 	const handleModalToggle = () => {
 		setIsModalOpen(!isModalOpen);
-		console.log("clicked!", isModalOpen);
 	};
 
 	return (
