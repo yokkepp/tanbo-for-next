@@ -1,4 +1,6 @@
 import { CopyIcon, DeleteIcon } from "@chakra-ui/icons";
+import { InformationsContext } from "@/app/layout";
+
 import {
 	Checkbox,
 	Table,
@@ -9,7 +11,10 @@ import {
 	Thead,
 	Tr,
 } from "@chakra-ui/react";
-import React from "react";
+import React, { useContext } from "react";
+import { LocalInformation } from "@/app/types";
+import { deleteDoc, doc } from "firebase/firestore";
+import { db } from "@/app/firebase";
 
 /**
  * doneListまたはnotDoneListを引数に渡すことで、リストを生成するコンポーネントです。
@@ -17,6 +22,24 @@ import React from "react";
  * @returns
  */
 export default function CreateTaskList({ informationList }: any) {
+	const [informations, setInformations]: any = useContext(InformationsContext);
+
+	/**
+	 * informationsから任意のinformationを削除する関数です。
+	 * @param e イベントです。
+	 */
+	const handleDeleteList = async (id: string) => {
+		if (confirm("本当に削除しますか？")) {
+			const newArray = await informations.filter(
+				(info: LocalInformation) => info.id !== id
+			);
+			setInformations(newArray);
+			deleteDoc(doc(db, "informations", id));
+		} else {
+			alert("キャンセルしました。");
+		}
+	};
+
 	return (
 		<TableContainer rounded={"base"} color={"white"} bg={"gray.900"}>
 			<Table variant='simple'>
@@ -58,7 +81,7 @@ export default function CreateTaskList({ informationList }: any) {
 									{info.progress}
 								</Td>
 								<Td textColor={"white"}>
-									<button>
+									<button onClick={() => handleDeleteList(info.id)}>
 										<DeleteIcon boxSize={"5"} />
 									</button>
 								</Td>
