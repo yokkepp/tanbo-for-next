@@ -1,3 +1,4 @@
+import { changeDateFormat } from "@/app/utils/common/functions";
 import { Box, SimpleGrid, Input, Text } from "@chakra-ui/react";
 export default function TasksParts(props: any) {
 	const {
@@ -5,7 +6,6 @@ export default function TasksParts(props: any) {
 		activeInformation,
 		handleChangeEditingValue,
 		handleClickUpdateElement,
-		changeDateFormat,
 	} = props;
 	return (
 		<Box>

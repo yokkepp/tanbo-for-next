@@ -78,7 +78,6 @@ function ActiveNote(props: Props) {
 						{isEditing.description ? (
 							<Textarea
 								id='description'
-								isReadOnly={!isEditing.description}
 								border={"none"}
 								textColor={"white"}
 								w={"100%"}
@@ -92,7 +91,7 @@ function ActiveNote(props: Props) {
 						) : (
 							<Textarea
 								id='description'
-								isReadOnly={isEditing.description}
+								isReadOnly={true}
 								border={"none"}
 								textColor={"white"}
 								resize={"none"}

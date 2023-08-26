@@ -21,7 +21,10 @@ import { db } from "@/app/firebase";
  * @param informationList Tasks画面にてリスト表示させたいinformationの配列です。
  * @returns
  */
-export default function CreateTaskList({ informationList }: any) {
+export default function CreateTaskList({
+	informationList,
+	handleChangeCheckbox,
+}: any) {
 	const [informations, setInformations]: any = useContext(InformationsContext);
 
 	/**
@@ -64,6 +67,7 @@ export default function CreateTaskList({ informationList }: any) {
 								<Td textColor={"white"}>
 									<Checkbox
 										isChecked={info.done}
+										onChange={() => handleChangeCheckbox(info.id)}
 										variant={"circular"}
 										colorScheme='teal'
 										size={"lg"}></Checkbox>

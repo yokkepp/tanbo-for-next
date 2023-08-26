@@ -4,9 +4,12 @@ import { useState, useContext, useEffect } from "react";
 import SearchConditionButtons from "../utils/Tasks/SearchConditionButtons";
 import CreateTaskList from "@/app/utils/Tasks/CreateTaskList";
 import { InformationsContext } from "../layout";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "../firebase";
+import { FirebaseInformation } from "../types";
 
 export default function Tasks() {
-	const [informations]: any = useContext(InformationsContext);
+	const [informations, setInformations]: any = useContext(InformationsContext);
 	const [doneList, setDoneList] = useState([]);
 	const [notDoneList, setNotDoneList] = useState([]);
 	const [localInformations, setLocalInformations] = useState([]);
@@ -44,6 +47,30 @@ export default function Tasks() {
 		setQuickTitle(e.target.value);
 	};
 
+	const handleChangeCheckbox = async (id: any) => {
+		const newInformations = [...informations];
+		setInformations(
+			newInformations.map((info) => {
+				if (info.id === id) {
+					//firebaseのdoneを更新する
+					//firebaseの更新対象を選択する。
+					const updateRef = doc(db, "informations", id);
+
+					//updateするときは、idは不要なので、削除したものをupdateする
+					const updateInformation: FirebaseInformation = {
+						...info,
+						done: !info.done,
+					};
+					delete updateInformation.id;
+					updateDoc(updateRef, updateInformation);
+					return { ...info, done: !info.done };
+				} else {
+					return info;
+				}
+			})
+		);
+	};
+
 	return (
 		<>
 			<Box w={"100%"} h={"100vh"} pt={"70px"} bg={"gray.900"} px={"20px"}>
@@ -63,20 +90,26 @@ export default function Tasks() {
 							<Stack spacing={3}>
 								<Box>
 									<Text textColor={"white"} fontSize={"xl"} w={"25%"}>
-										未完了タスク
+										未完了タスク（ {notDoneList.length} 件 ）
 									</Text>
 								</Box>
-								<CreateTaskList informationList={notDoneList} />
+								<CreateTaskList
+									informationList={notDoneList}
+									handleChangeCheckbox={handleChangeCheckbox}
+								/>
 							</Stack>
 						</Box>
 						<Box bg={"gray.800"} w={"100%"} rounded={"base"} p={"20px"}>
 							<Stack spacing={3}>
 								<Box>
 									<Text textColor={"white"} fontSize={"xl"} w={"25%"}>
-										完了済みタスク
+										完了済みタスク（ {doneList.length} 件 ）
 									</Text>
 								</Box>
-								<CreateTaskList informationList={doneList} />
+								<CreateTaskList
+									informationList={doneList}
+									handleChangeCheckbox={handleChangeCheckbox}
+								/>
 							</Stack>
 						</Box>
 					</Box>
