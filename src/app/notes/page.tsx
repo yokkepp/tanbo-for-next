@@ -114,7 +114,6 @@ export default function Notes() {
 		}));
 	};
 
-	//PROB:一つのinformationに対して、activeInformation, informations, firebaseのDBの3つを更新している。冗長になっている気がするが他の方法が知りたい。
 	/**
 	 * チェックボックスが変更された時に発火する関数です。
 	 */

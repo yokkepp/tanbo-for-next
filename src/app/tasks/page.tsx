@@ -12,8 +12,7 @@ export default function Tasks() {
 	const [informations, setInformations]: any = useContext(InformationsContext);
 	const [doneList, setDoneList] = useState([]);
 	const [notDoneList, setNotDoneList] = useState([]);
-	const [localInformations, setLocalInformations] = useState([]);
-	const [sortCondition, setSortCondition] = useState(""); //TODO:どの条件で入れる？？
+
 	const [quickTitle, setQuickTitle] = useState("");
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	//TODO: useState localInformationsを用意して、informationsをまとめて表示する時も表示形式を変更しておく必要がある。
