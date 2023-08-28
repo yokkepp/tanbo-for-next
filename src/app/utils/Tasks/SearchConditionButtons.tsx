@@ -5,11 +5,17 @@ import { Modal } from "../../../components/Modal";
 function SearchConditionButtons(props: any) {
 	const { quickTitle, handleChangeQuickTitle } = props;
 	const [isModalOpen, setIsModalOpen] = useState(false);
+	const [sortCondition, setSortCondition] = useState("");
 	/** モーダルを表示非表示を切り替える関数です。
 	 * @function
 	 */
 	const handleModalToggle = () => {
 		setIsModalOpen(!isModalOpen);
+	};
+
+	const handleSortCondition = (setting: string) => {
+		setSortCondition(setting);
+		console.log(sortCondition);
 	};
 
 	return (
@@ -18,36 +24,122 @@ function SearchConditionButtons(props: any) {
 			<Box display={"flex"} justifyContent={"space-between"}>
 				<Box display={"flex"}>
 					<Box pr={"20px"}>
-						<Button colorScheme='teal' variant={"solid"} w={"95px"} mr={"5px"}>
-							今日
-						</Button>
-						<Button
-							colorScheme='teal'
-							variant={"outline"}
-							w={"95px"}
-							mr={"5px"}>
-							今週
-						</Button>
-						<Button colorScheme='teal' variant={"outline"} w={"95px"}>
-							今月
-						</Button>
+						{sortCondition === "today" ? (
+							<Button
+								colorScheme='teal'
+								variant={"solid"}
+								w={"95px"}
+								mr={"5px"}
+								onClick={() => handleSortCondition("today")}>
+								今日
+							</Button>
+						) : (
+							<Button
+								colorScheme='teal'
+								variant={"outline"}
+								w={"95px"}
+								mr={"5px"}
+								onClick={() => handleSortCondition("today")}>
+								今日
+							</Button>
+						)}
+
+						{sortCondition === "thisWeek" ? (
+							<Button
+								colorScheme='teal'
+								variant={"solid"}
+								w={"95px"}
+								mr={"5px"}
+								onClick={() => handleSortCondition("thisWeek")}>
+								今週
+							</Button>
+						) : (
+							<Button
+								colorScheme='teal'
+								variant={"outline"}
+								w={"95px"}
+								mr={"5px"}
+								onClick={() => handleSortCondition("thisWeek")}>
+								今週
+							</Button>
+						)}
+						{sortCondition === "thisMonth" ? (
+							<Button
+								colorScheme='teal'
+								variant={"solid"}
+								w={"95px"}
+								onClick={() => handleSortCondition("thisMonth")}>
+								今月
+							</Button>
+						) : (
+							<Button
+								colorScheme='teal'
+								variant={"outline"}
+								w={"95px"}
+								onClick={() => handleSortCondition("thisMonth")}>
+								今月
+							</Button>
+						)}
 					</Box>
 					<Box pr={"20px"}>
-						<Button
-							colorScheme='teal'
-							variant={"outline"}
-							w={"95px"}
-							mr={"5px"}>
-							先7日間
-						</Button>
-						<Button colorScheme='teal' variant={"outline"} w={"95px"}>
-							先1ヶ月
-						</Button>
+						{sortCondition === "next7days" ? (
+							<Button
+								colorScheme='teal'
+								variant={"solid"}
+								w={"95px"}
+								mr={"5px"}
+								onClick={() => handleSortCondition("next7days")}>
+								先7日間
+							</Button>
+						) : (
+							<Button
+								colorScheme='teal'
+								variant={"outline"}
+								w={"95px"}
+								mr={"5px"}
+								onClick={() => handleSortCondition("next7days")}>
+								先7日間
+							</Button>
+						)}
+
+						{sortCondition === "next1month" ? (
+							<Button
+								colorScheme='teal'
+								variant={"solid"}
+								w={"95px"}
+								mr={"5px"}
+								onClick={() => handleSortCondition("next1month")}>
+								先1ヶ月
+							</Button>
+						) : (
+							<Button
+								colorScheme='teal'
+								variant={"outline"}
+								w={"95px"}
+								mr={"5px"}
+								onClick={() => handleSortCondition("next1month")}>
+								先1ヶ月
+							</Button>
+						)}
 					</Box>
 					<Box>
-						<Button colorScheme='teal' variant={"outline"} w={"95px"}>
-							全て
-						</Button>
+						{sortCondition === "all" ? (
+							<Button
+								colorScheme='teal'
+								variant={"solid"}
+								w={"95px"}
+								onClick={() => handleSortCondition("all")}>
+								全て
+							</Button>
+						) : (
+							<Button
+								colorScheme='teal'
+								variant={"outline"}
+								w={"95px"}
+								onClick={() => handleSortCondition("all")}>
+								全て
+							</Button>
+						)}
 					</Box>
 				</Box>
 				<Box display={"flex"} w={"40%"}>
