@@ -30,7 +30,7 @@ export default function Header() {
 			bgColor: "blueAlpha.900",
 		},
 	];
-	const [page, setPage] = useState("");
+	const [page, setPage] = useState(window.location.pathname);
 	const handlePage = (path: string) => {
 		setPage(path);
 		//先にwindow.location.pathnameが読み込まれる。
