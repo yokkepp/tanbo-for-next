@@ -44,10 +44,11 @@ function SearchConditionButtons() {
 		const nowInDB = changeDateFormat(date.toString()).dateAndTimeInDB;
 		console.log("now", now);
 		console.log("nowInDB", nowInDB);
+
 		//firebaseに追加する
 		const docRef = await addDoc(collection(db, "informations"), {
 			...INITIAL_INFORMATION,
-			title: quickTitle,
+			title: quickTitle.trim(),
 			createdAt: nowInDB,
 		});
 
@@ -58,11 +59,17 @@ function SearchConditionButtons() {
 				...INITIAL_INFORMATION,
 				createdAt: now,
 				id: docRef.id,
-				title: quickTitle,
+				title: quickTitle.trim(),
 			},
 		]);
 
 		//入力欄の初期化
+		setQuickTitle("");
+	};
+
+	const handleQuickTitleEmptyError = (e: any) => {
+		e.preventDefault();
+		alert("空欄では登録できません。");
 		setQuickTitle("");
 	};
 
@@ -191,7 +198,7 @@ function SearchConditionButtons() {
 					</Box>
 				</Box>
 				<Box w={"40%"}>
-					{quickTitle ? (
+					{quickTitle.trim() ? (
 						<form
 							style={{ display: "flex" }}
 							onSubmit={(e) => handleQuickSubmit(e)}>
@@ -202,18 +209,15 @@ function SearchConditionButtons() {
 								mr={"10px"}
 								value={quickTitle}
 								onChange={(e) => handleChangeQuickTitle(e)}
-								onSubmit={() => console.log("Hello")}
 							/>
-							<Button
-								w={"130px"}
-								colorScheme='green'
-								type='submit'
-								onSubmit={() => console.log("Hello")}>
+							<Button w={"130px"} colorScheme='green' type='submit'>
 								クイック追加
 							</Button>
 						</form>
 					) : (
-						<form style={{ display: "flex" }}>
+						<form
+							onSubmit={(e) => handleQuickTitleEmptyError(e)}
+							style={{ display: "flex" }}>
 							<Input
 								type='text'
 								placeholder='クイック作成'
