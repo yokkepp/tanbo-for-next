@@ -4,7 +4,6 @@ import { useContext, useEffect, useRef, useState } from "react";
 import {
 	Box,
 	Button,
-	Checkbox,
 	Input,
 	Stack,
 	Textarea,
@@ -27,19 +26,15 @@ export function Modal({ handleModalToggle }: any) {
 		useState(INITIAL_INFORMATION);
 
 	/**
-	 *
+	 * propで受け取った変更箇所の状態をaddingInformationに反映します。
 	 * @param e イベントです。
-	 * @param name 更新するプロパティ名を指定します。
+	 * @param prop addingInformationオブジェクトの変更箇所を指定します。
 	 */
-	function handleChangeInformation(e: any, name: string) {
-		setAddingInformation((prev: any) => ({ ...prev, [name]: e.target.value }));
-	}
-
 	const handleChangeAddingInformation = (e: any, prop: string) => {
 		setAddingInformation((prev) => ({ ...prev, [prop]: e.target.value }));
 	};
 	/**
-	 * モーダル出現時に件名に自動的にフォーカスを当てる
+	 * モーダル出現時に件名に自動的にフォーカスを当てます。
 	 */
 	const focusTitle = () => {
 		if (inputEl.current !== null) {
@@ -48,8 +43,7 @@ export function Modal({ handleModalToggle }: any) {
 	};
 
 	/**
-	 * 件名の変更を感知して、状態を保管する関数です。
-	 * @param e イベントです。
+	 * モーダル内部の追加ボタンを推したときに発火する関数です
 	 */
 	async function handleClickAddInformation() {
 		const date = new Date();
@@ -229,7 +223,7 @@ export function Modal({ handleModalToggle }: any) {
 								borderBottom={"solid"}
 								borderRight={"solid"}
 								borderColor={"gray.700"}
-								onChange={(e) => handleChangeInformation(e, "progress")}
+								onChange={(e) => handleChangeAddingInformation(e, "progress")}
 								value={addingInformation.progress}
 							/>
 						</SimpleGrid>

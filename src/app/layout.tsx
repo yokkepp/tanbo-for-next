@@ -5,6 +5,7 @@ import { useState, useEffect, createContext } from "react";
 import { db } from "./firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { LocalInformation, FirebaseInformation } from "./types";
+import { changeDateFormat } from "./utils/common/functions";
 
 export const InformationsContext = createContext<
 	FirebaseInformation[] | undefined
@@ -19,8 +20,6 @@ export default function RootLayout({
 共通処理はここに記載する。
 ------------------------------------------------------------*/
 
-	// import React, { useState, createContext } from "react";
-
 	const [informations, setInformations]: any = useState<FirebaseInformation[]>(
 		[]
 	);
@@ -31,7 +30,12 @@ export default function RootLayout({
 		getDocs(infoData).then((result) => {
 			const INITIAL_DATA: any[] = [];
 			result.forEach((doc) => {
-				INITIAL_DATA.push({ ...doc.data(), id: doc.id });
+				INITIAL_DATA.push({
+					...doc.data(),
+					id: doc.id,
+					createdAt: changeDateFormat(doc.data().createdAt.toString())
+						.dateAndTime,
+				});
 			});
 			setInformations(INITIAL_DATA);
 		});

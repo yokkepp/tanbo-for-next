@@ -13,17 +13,6 @@ export default function Tasks() {
 	const [doneList, setDoneList] = useState([]);
 	const [notDoneList, setNotDoneList] = useState([]);
 
-	const [quickTitle, setQuickTitle] = useState("");
-	const [isModalOpen, setIsModalOpen] = useState(false);
-	//TODO: useState localInformationsを用意して、informationsをまとめて表示する時も表示形式を変更しておく必要がある。
-	//TODO: 検索機能を実装する必要がある。ソート機能を作成して、doneList notDoneListを作成して、それぞれに格納→表示する。
-	/** モーダルを表示非表示を切り替える関数です。
-	 * @function
-	 */
-	const handleModalToggle = () => {
-		setIsModalOpen(!isModalOpen);
-	};
-
 	useEffect(() => {
 		//未完了のタスクリストを生成する関数です。
 		const notDoneList = informations.filter((info: any) => {
@@ -41,10 +30,6 @@ export default function Tasks() {
 		});
 		setDoneList(doneList);
 	}, [informations]);
-
-	const handleChangeQuickTitle = (e: any) => {
-		setQuickTitle(e.target.value);
-	};
 
 	const handleChangeCheckbox = async (id: any) => {
 		const newInformations = [...informations];
@@ -74,11 +59,7 @@ export default function Tasks() {
 		<>
 			<Box w={"100%"} h={"100vh"} pt={"70px"} bg={"gray.900"} px={"20px"}>
 				<Stack spacing={6}>
-					<SearchConditionButtons
-						quickTitle={quickTitle}
-						handleChangeQuickTitle={handleChangeQuickTitle}
-						handleModalToggle={handleModalToggle}
-					/>
+					<SearchConditionButtons />
 					<Box h={"calc(100vh - 160px)"} overflow={"scroll"}>
 						<Box
 							bg={"gray.800"}

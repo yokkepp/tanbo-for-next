@@ -1,11 +1,25 @@
 "use client";
-import { Box, Button, Input } from "@chakra-ui/react";
-import { useState } from "react";
+import {
+	Box,
+	Button,
+	Flex,
+	FormControl,
+	Input,
+	flexbox,
+} from "@chakra-ui/react";
+import { useContext, useState } from "react";
 import { Modal } from "../../../components/Modal";
-function SearchConditionButtons(props: any) {
-	const { quickTitle, handleChangeQuickTitle } = props;
+import { InformationsContext } from "@/app/layout";
+import { INITIAL_INFORMATION } from "@/app/consts/initial";
+import { changeDateFormat } from "../common/functions";
+import { addDoc, collection } from "firebase/firestore";
+import { db } from "@/app/firebase";
+
+function SearchConditionButtons() {
+	const [quickTitle, setQuickTitle] = useState("");
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [sortCondition, setSortCondition] = useState("");
+	const [informations, setInformations]: any = useContext(InformationsContext);
 	/** モーダルを表示非表示を切り替える関数です。
 	 * @function
 	 */
@@ -13,9 +27,43 @@ function SearchConditionButtons(props: any) {
 		setIsModalOpen(!isModalOpen);
 	};
 
+	const handleChangeQuickTitle = (e: any) => {
+		setQuickTitle(e.target.value);
+	};
+
 	const handleSortCondition = (setting: string) => {
 		setSortCondition(setting);
 		console.log(sortCondition);
+	};
+
+	const handleQuickSubmit = async (e: any) => {
+		e.preventDefault();
+
+		const date = new Date();
+		const now = changeDateFormat(date.toString()).dateAndTime;
+		const nowInDB = changeDateFormat(date.toString()).dateAndTimeInDB;
+		console.log("now", now);
+		console.log("nowInDB", nowInDB);
+		//firebaseに追加する
+		const docRef = await addDoc(collection(db, "informations"), {
+			...INITIAL_INFORMATION,
+			title: quickTitle,
+			createdAt: nowInDB,
+		});
+
+		//ローカルに追加する
+		setInformations([
+			...informations,
+			{
+				...INITIAL_INFORMATION,
+				createdAt: now,
+				id: docRef.id,
+				title: quickTitle,
+			},
+		]);
+
+		//入力欄の初期化
+		setQuickTitle("");
 	};
 
 	return (
@@ -142,22 +190,45 @@ function SearchConditionButtons(props: any) {
 						)}
 					</Box>
 				</Box>
-				<Box display={"flex"} w={"40%"}>
-					<Input
-						placeholder='クイック作成'
-						textColor={"white"}
-						mr={"10px"}
-						value={quickTitle}
-						onChange={(e) => handleChangeQuickTitle(e)}
-					/>
+				<Box w={"40%"}>
 					{quickTitle ? (
-						<Button w={"130px"} colorScheme='green'>
-							クイック追加
-						</Button>
+						<form
+							style={{ display: "flex" }}
+							onSubmit={(e) => handleQuickSubmit(e)}>
+							<Input
+								type='text'
+								placeholder='クイック作成'
+								textColor={"white"}
+								mr={"10px"}
+								value={quickTitle}
+								onChange={(e) => handleChangeQuickTitle(e)}
+								onSubmit={() => console.log("Hello")}
+							/>
+							<Button
+								w={"130px"}
+								colorScheme='green'
+								type='submit'
+								onSubmit={() => console.log("Hello")}>
+								クイック追加
+							</Button>
+						</form>
 					) : (
-						<Button w={"130px"} colorScheme='green' onClick={handleModalToggle}>
-							詳細追加
-						</Button>
+						<form style={{ display: "flex" }}>
+							<Input
+								type='text'
+								placeholder='クイック作成'
+								textColor={"white"}
+								mr={"10px"}
+								value={quickTitle}
+								onChange={(e) => handleChangeQuickTitle(e)}
+							/>
+							<Button
+								w={"130px"}
+								colorScheme='green'
+								onClick={handleModalToggle}>
+								詳細追加
+							</Button>
+						</form>
 					)}
 				</Box>
 			</Box>

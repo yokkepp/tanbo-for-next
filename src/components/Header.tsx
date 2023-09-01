@@ -2,40 +2,45 @@
 import Link from "next/link";
 import { Box, Text, Button } from "@chakra-ui/react";
 import Image from "next/image";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+
+const menus = [
+	{
+		name: "Home",
+		link: "/",
+		colorScheme: "gray",
+		bgColor: "gray.500",
+	},
+	{
+		name: "Tasks",
+		link: "/tasks",
+		colorScheme: "teal",
+		bgColor: "tealAlpha.900",
+	},
+	{
+		name: "Notes",
+		link: "/notes",
+		colorScheme: "orange",
+		bgColor: "orangeAlpha.900",
+	},
+	{
+		name: "Boards",
+		link: "/boards",
+		colorScheme: "blue",
+		bgColor: "blueAlpha.900",
+	},
+];
+
 export default function Header() {
-	const menus = [
-		{
-			name: "Home",
-			link: "/",
-			colorScheme: "gray",
-			bgColor: "gray.500",
-		},
-		{
-			name: "Tasks",
-			link: "/tasks",
-			colorScheme: "teal",
-			bgColor: "tealAlpha.900",
-		},
-		{
-			name: "Notes",
-			link: "/notes",
-			colorScheme: "orange",
-			bgColor: "orangeAlpha.900",
-		},
-		{
-			name: "Boards",
-			link: "/boards",
-			colorScheme: "blue",
-			bgColor: "blueAlpha.900",
-		},
-	];
-	const [page, setPage] = useState(window.location.pathname);
+	const [page, setPage] = useState<string>("");
+
+	useEffect(() => {
+		const INITIAL_PAGE = window.location.pathname;
+		setPage(INITIAL_PAGE);
+	}, []);
+
 	const handlePage = (path: string) => {
 		setPage(path);
-		//先にwindow.location.pathnameが読み込まれる。
-		//その後レンダリング
-		//useState
 		console.log(path);
 	};
 
