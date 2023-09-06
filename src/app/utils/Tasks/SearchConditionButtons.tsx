@@ -19,7 +19,7 @@ function SearchConditionButtons() {
 	const [quickTitle, setQuickTitle] = useState("");
 	const [isModalOpen, setIsModalOpen] = useState(false);
 	const [sortCondition, setSortCondition] = useState("");
-	const [informations, setInformations]: any = useContext(InformationsContext);
+	const { informations, setInformations } = useContext(InformationsContext)!;
 	/** モーダルを表示非表示を切り替える関数です。
 	 * @function
 	 */

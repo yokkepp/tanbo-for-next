@@ -1,15 +1,22 @@
 "use client";
 import Header from "@/components/Header";
 import { Providers } from "./providers";
-import { useState, useEffect, createContext } from "react";
+import React, {
+	useState,
+	useEffect,
+	createContext,
+	Dispatch,
+	SetStateAction,
+} from "react";
 import { db } from "./firebase";
 import { collection, getDocs } from "firebase/firestore";
-import { LocalInformation, FirebaseInformation } from "./types";
 import { changeDateFormat } from "./utils/common/functions";
+import { Information } from "./types";
 
-export const InformationsContext = createContext<
-	FirebaseInformation[] | undefined
->(undefined);
+export const InformationsContext = createContext<{
+	informations: Information[];
+	setInformations: Dispatch<SetStateAction<Information[]>>;
+} | null>(null);
 
 export default function RootLayout({
 	children,
@@ -20,15 +27,13 @@ export default function RootLayout({
 共通処理はここに記載する。
 ------------------------------------------------------------*/
 
-	const [informations, setInformations]: any = useState<FirebaseInformation[]>(
-		[]
-	);
+	const [informations, setInformations] = useState<Information[]>([]);
 
 	//レンダリング時にfirebaseからデータを読み込む。
 	useEffect(() => {
 		const infoData = collection(db, "informations");
 		getDocs(infoData).then((result) => {
-			const INITIAL_DATA: any[] = [];
+			const INITIAL_DATA: any = [];
 			result.forEach((doc) => {
 				INITIAL_DATA.push({
 					...doc.data(),
@@ -45,7 +50,8 @@ export default function RootLayout({
 		<html lang='ja'>
 			<body>
 				<Providers>
-					<InformationsContext.Provider value={[informations, setInformations]}>
+					<InformationsContext.Provider
+						value={{ informations, setInformations }}>
 						<Header />
 						{children}
 					</InformationsContext.Provider>

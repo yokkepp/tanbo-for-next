@@ -6,16 +6,19 @@ import CreateTaskList from "@/app/utils/Tasks/CreateTaskList";
 import { InformationsContext } from "../layout";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
-import { FirebaseInformation } from "../types";
+import { Information } from "../types";
 
 export default function Tasks() {
-	const [informations, setInformations]: any = useContext(InformationsContext);
-	const [doneList, setDoneList] = useState([]);
-	const [notDoneList, setNotDoneList] = useState([]);
+	const contextValue = useContext(InformationsContext);
+	if (contextValue) {
+	}
+	const { informations, setInformations } = useContext(InformationsContext)!;
+	const [doneList, setDoneList] = useState<Information[]>([]);
+	const [notDoneList, setNotDoneList] = useState<Information[]>([]);
 
 	useEffect(() => {
 		//未完了のタスクリストを生成する関数です。
-		const notDoneList = informations.filter((info: any) => {
+		const notDoneList = informations.filter((info) => {
 			if (info.done === false) {
 				return info;
 			}
@@ -23,7 +26,7 @@ export default function Tasks() {
 		setNotDoneList(notDoneList);
 
 		//未完了のタスクリストを生成する関数です。
-		const doneList = informations.filter((info: any) => {
+		const doneList = informations.filter((info: Information) => {
 			if (info.done === true) {
 				return info;
 			}
@@ -31,7 +34,7 @@ export default function Tasks() {
 		setDoneList(doneList);
 	}, [informations]);
 
-	const handleChangeCheckbox = async (id: any) => {
+	const handleChangeCheckbox = async (id: string) => {
 		const newInformations = [...informations];
 		setInformations(
 			newInformations.map((info) => {
@@ -41,7 +44,7 @@ export default function Tasks() {
 					const updateRef = doc(db, "informations", id);
 
 					//updateするときは、idは不要なので、削除したものをupdateする
-					const updateInformation: FirebaseInformation = {
+					const updateInformation: Information = {
 						...info,
 						done: !info.done,
 					};

@@ -13,7 +13,7 @@ import { db } from "@/app/firebase";
 import { addDoc, collection } from "firebase/firestore";
 import NotesParts from "./NotesParts";
 import BoardsParts from "./BoardsParts";
-import { LocalInformation } from "@/app/types";
+import { Information } from "@/app/types";
 import { INITIAL_INFORMATION } from "@/app/consts/initial";
 import { changeDateFormat } from "@/app/utils/common/functions";
 import { InformationsContext } from "@/app/layout";
@@ -46,6 +46,9 @@ export function Modal({ handleModalToggle }: any) {
 	 * モーダル内部の追加ボタンを推したときに発火する関数です
 	 */
 	async function handleClickAddInformation() {
+		if (addingInformation.title.trim() === "") {
+			alert("空欄では登録できません。");
+		}
 		const date = new Date();
 		const now = changeDateFormat(date.toString()).dateAndTime;
 		const nowInDB = changeDateFormat(date.toString()).dateAndTimeInDB;
@@ -54,7 +57,7 @@ export function Modal({ handleModalToggle }: any) {
 			...addingInformation,
 			createdAt: nowInDB,
 		});
-		setInformations((prev: LocalInformation[]) => [
+		setInformations((prev: Information[]) => [
 			...prev,
 			{ ...addingInformation, createdAt: now, id: docRef.id },
 		]);

@@ -8,10 +8,18 @@ import TasksParts from "@/components/TasksParts";
 import NotesParts from "@/components/NotesParts";
 import BoardsParts from "@/components/BoardsParts";
 import { BgMaskForInput } from "@/components/bgMaskForInput";
-import { LocalInformation, FirebaseInformation } from "../types";
+import { Information } from "../types";
 import { INITIAL_EDITING, INITIAL_INFORMATION } from "../consts/initial";
 import { db } from "../firebase";
-import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import {
+	deleteDoc,
+	doc,
+	updateDoc,
+	DocumentReference,
+	Firestore,
+	DocumentData,
+	collection,
+} from "firebase/firestore";
 import { InformationsContext } from "../layout";
 
 export default function Notes() {
@@ -26,10 +34,14 @@ export default function Notes() {
 
 	//1つのデータを管理します。
 	const [activeInformation, setActiveInformation] =
-		useState<LocalInformation>(INITIAL_INFORMATION);
+		useState<Information>(INITIAL_INFORMATION);
 
 	//全てのデータを管理します。
-	const [informations, setInformations] = useContext<any>(InformationsContext);
+	const contextValue = useContext(InformationsContext);
+	if (contextValue === null) {
+		return <div>Contextが提供されていません。</div>;
+	}
+	const { informations, setInformations } = contextValue;
 
 	/**
 	 *クリックされた要素だけを編集中のステータスに変更するための関数です。
@@ -53,7 +65,7 @@ export default function Notes() {
 		if (confirm("本当に削除しますか？")) {
 			const id: string = e.target.parentElement.id;
 			const newArray = await informations.filter(
-				(info: LocalInformation) => info.id !== id
+				(info: Information) => info.id !== id
 			);
 			setInformations(newArray);
 			setActiveInformation(INITIAL_INFORMATION);
@@ -66,18 +78,22 @@ export default function Notes() {
 	/**
 	 * 編集中以外の要素を押下することで、isEditingを初期化し、値を更新する関数です。
 	 */
-	const updateSubmit: any = async () => {
+	const updateSubmit = async () => {
 		//firebaseの更新対象を選択する。
-		const updateRef = doc(db, "informations", activeInformation.id);
+		const informationCollection = collection(db, "informations");
+		const updateRef: DocumentReference = doc(
+			informationCollection,
+			activeInformation.id
+		);
 
 		//updateするときは、idは不要なので、削除したものをupdateする
-		const updateInformation: FirebaseInformation = { ...activeInformation };
+		const updateInformation: Information = { ...activeInformation };
 		delete updateInformation.id;
 		await updateDoc(updateRef, updateInformation);
 
-		//informationsを更新してローカルを最新状態にする。
-		setInformations((prev: any) =>
-			prev.map((info: any) => {
+		//ローカルを最新状態にする。
+		setInformations((infos: Information[]) =>
+			infos.map((info) => {
 				if (info.id === activeInformation.id) {
 					return activeInformation;
 				} else {
@@ -95,10 +111,10 @@ export default function Notes() {
 	 */
 	const handleActiveInformation = (e: { target: { id: string } }) => {
 		const newActiveInformationArray = informations.filter(
-			(info: LocalInformation) => info.id === e.target.id
+			(info: Information) => info.id === e.target.id
 		);
 
-		const newActiveInformation: LocalInformation = newActiveInformationArray[0];
+		const newActiveInformation: Information = newActiveInformationArray[0];
 		setActiveInformation(newActiveInformation);
 	};
 
@@ -108,7 +124,7 @@ export default function Notes() {
 	const handleChangeEditingValue = (e: {
 		target: { value: string | number };
 	}) => {
-		setActiveInformation((prev) => ({
+		setActiveInformation((prev: Information) => ({
 			...prev,
 			[editingElement]: e.target.value,
 		}));
@@ -119,7 +135,7 @@ export default function Notes() {
 	 */
 	const handleChangeCheckbox = async () => {
 		//ローカルのdoneを更新する
-		setActiveInformation((prev) => ({
+		setActiveInformation((prev: Information) => ({
 			...prev,
 			done: !activeInformation.done,
 		}));
@@ -137,10 +153,14 @@ export default function Notes() {
 
 		//firebaseのdoneを更新する
 		//firebaseの更新対象を選択する。
-		const updateRef = doc(db, "informations", activeInformation.id);
+		const informationCollection = collection(db, "informations");
+		const updateRef: DocumentReference = doc(
+			informationCollection,
+			activeInformation.id
+		);
 
 		//updateするときは、idは不要なので、削除したものをupdateする
-		const updateInformation: FirebaseInformation = {
+		const updateInformation: Information = {
 			...activeInformation,
 			done: !activeInformation.done,
 		};

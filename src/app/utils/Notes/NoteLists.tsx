@@ -6,7 +6,8 @@ import React, { useContext } from "react";
 
 function NoteLists(props: any) {
 	//全てのデータを管理します。
-	const [informations, setInformations]: any = useContext(InformationsContext);
+	const { informations, setInformations } = useContext(InformationsContext)!;
+
 	const { activeInformation, handleDeleteList, handleActiveInformation } =
 		props;
 	return (

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Box, Text, Button } from "@chakra-ui/react";
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
+import { useRouter } from "next/router";
 
 const menus = [
 	{
@@ -32,7 +33,20 @@ const menus = [
 ];
 
 export default function Header() {
+	//TODO: 【要修正】ブラウザで戻るボタンを押すと、Stateが変わらないため、HeaderとPageが異なる。
+	// const router = useRouter();
 	const [page, setPage] = useState<string>("");
+
+	// useEffect(() => {
+	// 	// ページのパスに基づいてページステートを設定
+	// 	if (router.pathname === "/notes") {
+	// 		setPage(router.pathname);
+	// 	} else if (router.pathname === "/another-page") {
+	// 		setPage("another-page");
+	// 	} else {
+	// 		setPage("unknown");
+	// 	}
+	// }, [router.pathname]);
 
 	useEffect(() => {
 		const INITIAL_PAGE = window.location.pathname;
