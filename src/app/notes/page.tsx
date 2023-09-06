@@ -63,7 +63,7 @@ export default function Notes() {
 		target: { parentElement: { id: string } };
 	}) => {
 		if (confirm("本当に削除しますか？")) {
-			const id: string = e.target.parentElement.id;
+			const id = e.target.parentElement.id;
 			const newArray = await informations.filter(
 				(info: Information) => info.id !== id
 			);

@@ -1,4 +1,4 @@
-import { LocalInformation } from "@/app/types";
+import { Information } from "@/app/types";
 import { Box, Checkbox, Input, Text, Textarea } from "@chakra-ui/react";
 import React from "react";
 
@@ -17,7 +17,7 @@ type Props = {
 		boardsArchive: boolean;
 		all: boolean;
 	};
-	activeInformation: LocalInformation;
+	activeInformation: Information;
 	handleChangeCheckbox: () => Promise<void>;
 	handleClickUpdateElement: any;
 	handleChangeEditingValue: (e: {

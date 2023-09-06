@@ -1,7 +1,7 @@
 "use Client";
-import React, { useContext, useState } from "react";
+import React, { MouseEvent, useContext, useState } from "react";
 import { CopyIcon, DeleteIcon } from "@chakra-ui/icons";
-import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/app/firebase";
 import {
 	Checkbox,
@@ -60,51 +60,37 @@ export default function CreateTaskList({
 
 	const handleChangeEditingValue = (e: any, id: string, prop: string) => {
 		setEditingState({ id, prop, value: e.target.value });
-		console.log(editingState);
 	};
 
 	const handleClick = (
-		e: React.MouseEvent<HTMLInputElement, MouseEvent>,
+		e: MouseEvent<HTMLInputElement>,
 		id: string,
 		prop: string
-	) => {};
+	) => {
+		setEditingState({ id, prop, value: e.currentTarget.value });
+	};
+
 	/**
 	 * フォーカスが外れた時に、firebaseとinformationsを更新する関数です。
 	 */
 	const handleBlurUpdateEditingValue = async () => {
-		// //空欄の場合は登録させない。
-		// if (editingState.prop === "title" && editingState.value.trim() === "") {
-		// 	alert("空欄では登録できません。");
+		//■firebaseのInformationsを更新
+		const informationCollection = collection(db, "informations");
+		const updateRef = doc(informationCollection, editingState.id);
+		const newInformation: Information | undefined = informations.find(
+			(info: Information) => info.id === editingState.id
+		);
 
-		// 	//元に戻すために、informationsからデータを引っ張る
-		// 	const prevInformation = informations.filter((info: Information) => {
-		// 		if (editingState.id === editingState.id) {
-		// 			return info;
-		// 		}
-		// 	});
-
-		// 	setEditingState({ value: prevInformation[prop] });
-		// 	//TODO:そもそも何でこれに入れてるのか不明。確認して修正する。
-		// }
-
-		//firebaseの更新対象を選択する。
-		const updateRef = doc(db, "informations", editingState.id);
-
-		const newInformation = informations.filter((info: Information) => {
-			if (info.id === editingState.id) {
-				return info;
-			}
-		});
-
-		const updateInformation: Information = {
-			...newInformation[0],
-			[editingState.prop]: editingState.value,
-		};
-		//updateするときは、idは不要なので、削除したものをupdateする
-		delete updateInformation.id;
-		await updateDoc(updateRef, updateInformation);
-
-		//ローカルのInformationsを更新
+		if (newInformation) {
+			const updateInformation: Information = {
+				...newInformation,
+				[editingState.prop]: editingState.value,
+			};
+			//updateするときは、idは不要なので、削除したものをupdateする
+			delete updateInformation.id;
+			await updateDoc(updateRef, updateInformation);
+		}
+		//■ローカルのInformationsを更新
 		setInformations((infos: Information[]) =>
 			infos.map((info) => {
 				if (info.id === editingState.id) {
@@ -114,9 +100,8 @@ export default function CreateTaskList({
 				}
 			})
 		);
-		//初期化
+		//■初期化
 		setEditingState({ id: "", prop: "", value: "" });
-		console.log("onBlur");
 	};
 
 	return (
@@ -124,12 +109,22 @@ export default function CreateTaskList({
 			<Table variant='simple'>
 				<Thead bg={"gray.700"}>
 					<Tr>
-						<Th textColor={"white"}></Th>
-						<Th textColor={"white"}>作成日</Th>
-						<Th textColor={"white"}>タイトル</Th>
-						<Th textColor={"white"}>詳細</Th>
-						<Th textColor={"white"}>開始予定</Th>
-						<Th textColor={"white"}>終了予定</Th>
+						<Th textColor={"white"} width={"70px"}></Th>
+						<Th textColor={"white"} w={"180px"}>
+							作成日
+						</Th>
+						<Th textColor={"white"} w={"2px"}>
+							タイトル
+						</Th>
+						<Th textColor={"white"} w={"80px"}>
+							詳細
+						</Th>
+						<Th textColor={"white"} w={"180px"}>
+							開始予定
+						</Th>
+						<Th textColor={"white"} w={"80px"}>
+							終了予定
+						</Th>
 						<Th textColor={"white"} isNumeric>
 							進捗率(%)
 						</Th>
@@ -140,7 +135,7 @@ export default function CreateTaskList({
 					{informationList.map((info: any) => {
 						return (
 							<Tr key={info.id} id={info.id}>
-								<Td textColor={"white"} width={"70px"}>
+								<Td textColor={"white"}>
 									<Checkbox
 										isChecked={info.done}
 										onChange={() => handleChangeCheckbox(info.id)}
@@ -148,12 +143,11 @@ export default function CreateTaskList({
 										colorScheme='teal'
 										size={"lg"}></Checkbox>
 								</Td>
-								<Td textColor={"white"} w={"180px"}>
-									{info.createdAt}
-								</Td>
-								<Td textColor={"white"} w={"100%"}>
+								<Td textColor={"white"}>{info.createdAt}</Td>
+								<Td textColor={"white"}>
 									{editingState.id !== info.id ? (
 										<Input
+											type='text'
 											value={info.title}
 											border={"none"}
 											isReadOnly={true}
@@ -162,6 +156,7 @@ export default function CreateTaskList({
 										/>
 									) : (
 										<Input
+											type='text'
 											value={editingState.value}
 											onChange={(e) =>
 												handleChangeEditingValue(e, info.id, "title")
@@ -173,20 +168,37 @@ export default function CreateTaskList({
 										/>
 									)}
 								</Td>
-								<Td textColor={"white"} w={"80px"}>
+								<Td textColor={"white"}>
 									<button>
 										<CopyIcon boxSize={"6"} />
 									</button>
 								</Td>
-								<Td textColor={"white"} w={"180px"}>
-									{info.planStart}
+								<Td textColor={"white"}>
+									{editingState.id !== info.id ? (
+										<Input
+											type='date'
+											value={info.planStart}
+											border={"none"}
+											isReadOnly={true}
+											p={"0"}
+											onClick={(e) => handleClick(e, info.id, "planStart")}
+										/>
+									) : (
+										<Input
+											value={editingState.value}
+											onChange={(e) =>
+												handleChangeEditingValue(e, info.id, "planStart")
+											}
+											onBlur={handleBlurUpdateEditingValue}
+											border={"none"}
+											p={"0"}
+											_focus={{ outline: "none", boxShadow: "none" }}
+										/>
+									)}
 								</Td>
-								<Td textColor={"white"} w={"180px"}>
-									{info.planEnd}
-								</Td>
+								<Td textColor={"white"}>{info.planEnd}</Td>
 								<Td
 									textColor={"white"}
-									w={"80px"}
 									isNumeric
 									onClick={() => alert("onClick")}>
 									<CircularProgress value={info.progress} color='teal.400'>
@@ -195,7 +207,7 @@ export default function CreateTaskList({
 										</CircularProgressLabel>
 									</CircularProgress>
 								</Td>
-								<Td textColor={"white"} w={"80px"}>
+								<Td textColor={"white"}>
 									<button onClick={() => handleDeleteList(info.id)}>
 										<DeleteIcon boxSize={"5"} />
 									</button>
