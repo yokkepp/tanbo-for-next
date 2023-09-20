@@ -1,5 +1,12 @@
 "use Client";
-import React, { MouseEvent, useContext, useState } from "react";
+import React, {
+	ChangeEvent,
+	Dispatch,
+	MouseEvent,
+	SetStateAction,
+	useContext,
+	useState,
+} from "react";
 import { CopyIcon, DeleteIcon } from "@chakra-ui/icons";
 import { collection, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/app/firebase";
@@ -18,7 +25,11 @@ import {
 } from "@chakra-ui/react";
 import { InformationsContext } from "@/app/layout";
 import { Information } from "@/app/types";
-import { INITIAL_INFORMATION } from "@/app/consts/initial";
+
+type InformationsContext = {
+	informations: Information[];
+	setInformations: Dispatch<SetStateAction<Information[]>>;
+};
 
 /**
  * doneListまたはnotDoneListを引数に渡すことで、リストを生成するコンポーネントです。
@@ -28,8 +39,12 @@ import { INITIAL_INFORMATION } from "@/app/consts/initial";
 export default function CreateTaskList({
 	informationList,
 	handleChangeCheckbox,
-}: any) {
-	const { informations, setInformations } = useContext(InformationsContext)!;
+}: {
+	informationList: Information[];
+	handleChangeCheckbox: (id: string) => Promise<void>;
+}) {
+	const { informations, setInformations }: InformationsContext =
+		useContext(InformationsContext)!;
 
 	/**
 	 * informationsから任意のinformationを削除する関数です。
@@ -63,17 +78,25 @@ export default function CreateTaskList({
 	};
 
 	const handleClick = (
-		e: MouseEvent<HTMLInputElement>,
+		e: React.MouseEvent<HTMLInputElement | HTMLDivElement>,
 		id: string,
 		prop: string
 	) => {
-		setEditingState({ id, prop, value: e.currentTarget.value });
+		let value = "";
+		if (e.currentTarget instanceof HTMLInputElement) {
+			value = e.currentTarget.value;
+		}
+		setEditingState({ id, prop, value: value });
 	};
 
 	/**
 	 * フォーカスが外れた時に、firebaseとinformationsを更新する関数です。
 	 */
-	const handleBlurUpdateEditingValue = async () => {
+	const handleBlurUpdateEditingValue: any = async (id: string) => {
+		if (editingState.value === "" && editingState.prop === "title") {
+			alert("空欄では保存できません");
+		}
+
 		//■firebaseのInformationsを更新
 		const informationCollection = collection(db, "informations");
 		const updateRef = doc(informationCollection, editingState.id);
@@ -105,15 +128,19 @@ export default function CreateTaskList({
 	};
 
 	return (
-		<TableContainer rounded={"base"} color={"white"} bg={"gray.900"}>
-			<Table variant='simple'>
+		<TableContainer
+			rounded={"base"}
+			color={"white"}
+			bg={"gray.900"}
+			overflowX={"auto"}>
+			<Table variant='simple' layout='fixed'>
 				<Thead bg={"gray.700"}>
 					<Tr>
-						<Th textColor={"white"} width={"70px"}></Th>
+						<Th textColor={"white"} w={"70px"}></Th>
 						<Th textColor={"white"} w={"180px"}>
 							作成日
 						</Th>
-						<Th textColor={"white"} w={"2px"}>
+						<Th textColor={"white"} w={"400px"}>
 							タイトル
 						</Th>
 						<Th textColor={"white"} w={"80px"}>
@@ -122,99 +149,147 @@ export default function CreateTaskList({
 						<Th textColor={"white"} w={"180px"}>
 							開始予定
 						</Th>
-						<Th textColor={"white"} w={"80px"}>
+						<Th textColor={"white"} w={"180px"}>
 							終了予定
 						</Th>
 						<Th textColor={"white"} isNumeric>
 							進捗率(%)
 						</Th>
-						<Th textColor={"white"}></Th>
+						<Th textColor={"white"} w={"70px"}></Th>
 					</Tr>
 				</Thead>
 				<Tbody>
-					{informationList.map((info: any) => {
-						return (
-							<Tr key={info.id} id={info.id}>
-								<Td textColor={"white"}>
-									<Checkbox
-										isChecked={info.done}
-										onChange={() => handleChangeCheckbox(info.id)}
-										variant={"circular"}
-										colorScheme='teal'
-										size={"lg"}></Checkbox>
-								</Td>
-								<Td textColor={"white"}>{info.createdAt}</Td>
-								<Td textColor={"white"}>
-									{editingState.id !== info.id ? (
-										<Input
-											type='text'
-											value={info.title}
-											border={"none"}
-											isReadOnly={true}
-											p={"0"}
-											onClick={(e) => handleClick(e, info.id, "title")}
-										/>
-									) : (
-										<Input
-											type='text'
-											value={editingState.value}
-											onChange={(e) =>
-												handleChangeEditingValue(e, info.id, "title")
-											}
-											onBlur={handleBlurUpdateEditingValue}
-											border={"none"}
-											p={"0"}
-											_focus={{ outline: "none", boxShadow: "none" }}
-										/>
-									)}
-								</Td>
-								<Td textColor={"white"}>
-									<button>
-										<CopyIcon boxSize={"6"} />
-									</button>
-								</Td>
-								<Td textColor={"white"}>
-									{editingState.id !== info.id ? (
-										<Input
-											type='date'
-											value={info.planStart}
-											border={"none"}
-											isReadOnly={true}
-											p={"0"}
-											onClick={(e) => handleClick(e, info.id, "planStart")}
-										/>
-									) : (
-										<Input
-											value={editingState.value}
-											onChange={(e) =>
-												handleChangeEditingValue(e, info.id, "planStart")
-											}
-											onBlur={handleBlurUpdateEditingValue}
-											border={"none"}
-											p={"0"}
-											_focus={{ outline: "none", boxShadow: "none" }}
-										/>
-									)}
-								</Td>
-								<Td textColor={"white"}>{info.planEnd}</Td>
-								<Td
-									textColor={"white"}
-									isNumeric
-									onClick={() => alert("onClick")}>
+					{informationList.map((info) => (
+						<Tr key={info.id} id={info.id}>
+							<Td textColor={"white"}>
+								<Checkbox
+									isChecked={info.done}
+									onChange={() => handleChangeCheckbox(info.id!)}
+									variant={"circular"}
+									colorScheme='teal'
+									size={"lg"}></Checkbox>
+							</Td>
+							<Td textColor={"white"}>{info.createdAt}</Td>
+							<Td textColor={"white"}>
+								{editingState.id === info.id &&
+								editingState.prop === "title" ? (
+									<Input
+										type='text'
+										value={editingState.value}
+										autoFocus
+										isRequired
+										onChange={(e) =>
+											handleChangeEditingValue(e, info.id!, "title")
+										}
+										onBlur={handleBlurUpdateEditingValue}
+										border={"none"}
+										p={"0"}
+										_focus={{ outline: "none", boxShadow: "none" }}
+									/>
+								) : (
+									<Input
+										type='text'
+										value={info.title}
+										border={"none"}
+										isReadOnly={true}
+										autoFocus
+										isRequired
+										p={"0"}
+										onClick={(e) => handleClick(e, info.id!, "title")}
+									/>
+								)}
+							</Td>
+							<Td textColor={"white"}>
+								<button>
+									<CopyIcon boxSize={"6"} />
+								</button>
+							</Td>
+							<Td textColor={"white"}>
+								{editingState.id === info.id &&
+								editingState.prop === "planStart" ? (
+									<Input
+										type='date'
+										value={editingState.value}
+										onChange={(e) =>
+											handleChangeEditingValue(e, info.id!, "planStart")
+										}
+										onBlur={handleBlurUpdateEditingValue}
+										border={"none"}
+										p={"0"}
+										_focus={{ outline: "none", boxShadow: "none" }}
+									/>
+								) : (
+									<Input
+										type='date'
+										value={info.planStart}
+										border={"none"}
+										isReadOnly={true}
+										p={"0"}
+										onClick={(e) => handleClick(e, info.id!, "planStart")}
+									/>
+								)}
+							</Td>
+							<Td textColor={"white"}>
+								{editingState.id === info.id &&
+								editingState.prop === "planEnd" ? (
+									<Input
+										type='date'
+										value={editingState.value}
+										onChange={(e) =>
+											handleChangeEditingValue(e, info.id!, "planEnd")
+										}
+										onBlur={handleBlurUpdateEditingValue}
+										border={"none"}
+										p={"0"}
+										_focus={{ outline: "none", boxShadow: "none" }}
+									/>
+								) : (
+									<Input
+										type='date'
+										value={info.planEnd}
+										border={"none"}
+										isReadOnly={true}
+										p={"0"}
+										onClick={(e) => handleClick(e, info.id!, "planEnd")}
+									/>
+								)}
+							</Td>
+							<Td
+								textColor={"white"}
+								isNumeric
+								onClick={() => console.log("HELLO")}>
+								{editingState.id === info.id &&
+								editingState.prop === "progress" ? (
+									<Input
+										onBlur={handleBlurUpdateEditingValue}
+										type='number'
+										autoFocus
+										min={0}
+										max={100}
+										value={editingState.value}
+										border={"none"}
+										textAlign={"center"}
+										p={"0"}
+										onChange={(e) =>
+											handleChangeEditingValue(e, info.id!, "progress")
+										}
+									/>
+								) : (
 									<CircularProgress value={info.progress} color='teal.400'>
-										<CircularProgressLabel>
+										<CircularProgressLabel
+											onClick={(e) => handleClick(e, info.id!, "progress")}>
 											{info.progress}%
 										</CircularProgressLabel>
 									</CircularProgress>
-								</Td>
-								<Td textColor={"white"}>
-									<button onClick={() => handleDeleteList(info.id)}>
-										<DeleteIcon boxSize={"5"} />
-									</button>
-								</Td>
-							</Tr>
-						);
-					})}
+								)}
+							</Td>
+							<Td textColor={"white"}>
+								<button onClick={() => handleDeleteList(info.id!)}>
+									<DeleteIcon boxSize={"5"} />
+								</button>
+							</Td>
+						</Tr>
+					))}
 				</Tbody>
 			</Table>
 		</TableContainer>

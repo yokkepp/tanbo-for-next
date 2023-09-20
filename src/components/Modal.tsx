@@ -20,7 +20,7 @@ import { InformationsContext } from "@/app/layout";
 
 export function Modal({ handleModalToggle }: any) {
 	//全てのデータを管理します。
-	const [informations, setInformations] = useContext<any>(InformationsContext);
+	const { setInformations } = useContext<any>(InformationsContext);
 	const inputEl = useRef<HTMLInputElement>(null);
 	const [addingInformation, setAddingInformation] =
 		useState(INITIAL_INFORMATION);

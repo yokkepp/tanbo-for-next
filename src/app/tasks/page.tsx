@@ -72,7 +72,7 @@ export default function Tasks() {
 							mb={"20px"}>
 							<Stack spacing={3}>
 								<Box>
-									<Text textColor={"white"} fontSize={"xl"} w={"25%"}>
+									<Text textColor={"white"} fontSize={"xl"} w={"100%"}>
 										未完了タスク（ {notDoneList.length} 件 ）
 									</Text>
 								</Box>
@@ -85,7 +85,7 @@ export default function Tasks() {
 						<Box bg={"gray.800"} w={"100%"} rounded={"base"} p={"20px"}>
 							<Stack spacing={3}>
 								<Box>
-									<Text textColor={"white"} fontSize={"xl"} w={"25%"}>
+									<Text textColor={"white"} fontSize={"xl"} w={"100%"}>
 										完了済みタスク（ {doneList.length} 件 ）
 									</Text>
 								</Box>
