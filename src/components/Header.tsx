@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Box, Text, Button } from "@chakra-ui/react";
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
-import { useRouter } from "next/router";
+import { usePathname, useRouter } from "next/navigation";
 
 const menus = [
 	{
@@ -33,30 +33,12 @@ const menus = [
 ];
 
 export default function Header() {
-	//TODO: 【要修正】ブラウザで戻るボタンを押すと、Stateが変わらないため、HeaderとPageが異なる。
-	// const router = useRouter();
+	const pathName = usePathname();
 	const [page, setPage] = useState<string>("");
 
-	// useEffect(() => {
-	// 	// ページのパスに基づいてページステートを設定
-	// 	if (router.pathname === "/notes") {
-	// 		setPage(router.pathname);
-	// 	} else if (router.pathname === "/another-page") {
-	// 		setPage("another-page");
-	// 	} else {
-	// 		setPage("unknown");
-	// 	}
-	// }, [router.pathname]);
-
 	useEffect(() => {
-		const INITIAL_PAGE = window.location.pathname;
-		setPage(INITIAL_PAGE);
-	}, []);
-
-	const handlePage = (path: string) => {
-		setPage(path);
-		console.log(path);
-	};
+		setPage(pathName);
+	}, [pathName]);
 
 	return (
 		<Box
@@ -77,7 +59,6 @@ export default function Header() {
 						<Button
 							m={"5px"}
 							colorScheme={"gray"}
-							onClick={() => handlePage("/")}
 							variant={page === "/" ? "solid" : "outline"}
 							textColor={"gray.500"}
 							borderColor={"gray.500"}>
@@ -88,7 +69,6 @@ export default function Header() {
 						<Button
 							m={"5px"}
 							colorScheme={"teal"}
-							onClick={() => handlePage("/tasks")}
 							variant={page === "/tasks" ? "solid" : "outline"}>
 							Tasks
 						</Button>
@@ -97,7 +77,6 @@ export default function Header() {
 						<Button
 							m={"5px"}
 							colorScheme={"orange"}
-							onClick={() => handlePage("/notes")}
 							variant={page === "/notes" ? "solid" : "outline"}>
 							Notes
 						</Button>
@@ -106,7 +85,6 @@ export default function Header() {
 						<Button
 							m={"5px"}
 							colorScheme={"blue"}
-							onClick={() => handlePage("/boards")}
 							variant={page === "/boards" ? "solid" : "outline"}>
 							Boards
 						</Button>
