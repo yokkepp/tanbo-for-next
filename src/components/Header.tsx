@@ -1,36 +1,9 @@
 "use client";
 import Link from "next/link";
-import { Box, Text, Button } from "@chakra-ui/react";
+import { Box, Button } from "@chakra-ui/react";
 import Image from "next/image";
-import { useContext, useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
-
-const menus = [
-	{
-		name: "Home",
-		link: "/",
-		colorScheme: "gray",
-		bgColor: "gray.500",
-	},
-	{
-		name: "Tasks",
-		link: "/tasks",
-		colorScheme: "teal",
-		bgColor: "tealAlpha.900",
-	},
-	{
-		name: "Notes",
-		link: "/notes",
-		colorScheme: "orange",
-		bgColor: "orangeAlpha.900",
-	},
-	{
-		name: "Boards",
-		link: "/boards",
-		colorScheme: "blue",
-		bgColor: "blueAlpha.900",
-	},
-];
+import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function Header() {
 	const pathName = usePathname();
