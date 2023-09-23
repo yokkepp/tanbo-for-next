@@ -18,9 +18,13 @@ import { INITIAL_INFORMATION } from "@/app/consts/initial";
 import { changeDateFormat } from "@/app/utils/common/functions";
 import { InformationsContext } from "@/app/layout";
 
-export function Modal({ handleModalToggle }: any) {
+export function Modal({
+	handleModalToggle,
+}: {
+	handleModalToggle: () => void;
+}) {
 	//全てのデータを管理します。
-	const { setInformations } = useContext<any>(InformationsContext);
+	const { setInformations } = useContext(InformationsContext)!;
 	const inputEl = useRef<HTMLInputElement>(null);
 	const [addingInformation, setAddingInformation] =
 		useState(INITIAL_INFORMATION);
