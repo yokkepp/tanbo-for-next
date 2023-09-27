@@ -3,36 +3,60 @@ import { Box, Stack, Text } from "@chakra-ui/react";
 import { useState, useContext, useEffect } from "react";
 import SearchConditionButtons from "../utils/Tasks/SearchConditionButtons";
 import CreateTaskList from "@/app/utils/Tasks/CreateTaskList";
-import { InformationsContext } from "../layout";
+import { InformationsContext, SortConditionContext } from "../layout";
 import { doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { Information } from "../types";
+import { sortConditionRange } from "../utils/common/functions";
 
 export default function Tasks() {
 	const contextValue = useContext(InformationsContext);
 	if (contextValue) {
 	}
 	const { informations, setInformations } = useContext(InformationsContext)!;
+	const { sortCondition, setSortCondition } = useContext(SortConditionContext)!;
 	const [doneList, setDoneList] = useState<Information[]>([]);
 	const [notDoneList, setNotDoneList] = useState<Information[]>([]);
 
 	useEffect(() => {
+		const sortRange = sortConditionRange(sortCondition);
+		const { startDate, endDate } = sortRange;
 		//未完了のタスクリストを生成する関数です。
 		const notDoneList = informations.filter((info) => {
-			if (info.done === false) {
+			const timeLimitDate = new Date(info.timeLimit);
+			if (sortCondition === "all" && info.done === false) {
+				console.log(typeof timeLimitDate, timeLimitDate);
+				return info;
+			}
+
+			if (
+				info.done === false &&
+				startDate <= timeLimitDate &&
+				timeLimitDate <= endDate
+			) {
 				return info;
 			}
 		});
 		setNotDoneList(notDoneList);
 
 		//未完了のタスクリストを生成する関数です。
-		const doneList = informations.filter((info: Information) => {
-			if (info.done === true) {
+		const doneList = informations.filter((info) => {
+			const timeLimitDate = new Date(info.timeLimit);
+			if (sortCondition === "all" && info.done !== false) {
+				console.log(typeof timeLimitDate, timeLimitDate);
+				return info;
+			}
+
+			if (
+				info.done !== false &&
+				startDate <= timeLimitDate &&
+				timeLimitDate <= endDate
+			) {
 				return info;
 			}
 		});
 		setDoneList(doneList);
-	}, [informations]);
+	}, [informations, sortCondition]);
 
 	const handleChangeCheckbox = async (id: string) => {
 		const newInformations = [...informations];
