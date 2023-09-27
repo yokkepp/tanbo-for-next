@@ -11,12 +11,17 @@ import React, {
 import { db } from "./firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { changeDateFormat } from "./utils/common/functions";
-import { Information } from "./types";
+import {
+	Information,
+	InformationsContextType,
+	SortConditionContextType,
+} from "./types";
 
-export const InformationsContext = createContext<{
-	informations: Information[];
-	setInformations: Dispatch<SetStateAction<Information[]>>;
-} | null>(null);
+export const InformationsContext =
+	createContext<InformationsContextType | null>(null);
+
+export const SortConditionContext =
+	createContext<SortConditionContextType | null>(null);
 
 export default function RootLayout({
 	children,
@@ -28,6 +33,7 @@ export default function RootLayout({
 ------------------------------------------------------------*/
 
 	const [informations, setInformations] = useState<Information[]>([]);
+	const [sortCondition, setSortCondition] = useState("all");
 
 	//レンダリング時にfirebaseからデータを読み込む。
 	useEffect(() => {
@@ -50,11 +56,14 @@ export default function RootLayout({
 		<html lang='ja'>
 			<body>
 				<Providers>
-					<InformationsContext.Provider
-						value={{ informations, setInformations }}>
-						<Header />
-						{children}
-					</InformationsContext.Provider>
+					<SortConditionContext.Provider
+						value={{ sortCondition, setSortCondition }}>
+						<InformationsContext.Provider
+							value={{ informations, setInformations }}>
+							<Header />
+							{children}
+						</InformationsContext.Provider>
+					</SortConditionContext.Provider>
 				</Providers>
 			</body>
 		</html>

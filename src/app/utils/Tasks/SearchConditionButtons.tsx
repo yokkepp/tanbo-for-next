@@ -1,15 +1,8 @@
 "use client";
-import {
-	Box,
-	Button,
-	Flex,
-	FormControl,
-	Input,
-	flexbox,
-} from "@chakra-ui/react";
+import { Box, Button, Input } from "@chakra-ui/react";
 import { useContext, useState } from "react";
 import { Modal } from "../../../components/Modal";
-import { InformationsContext } from "@/app/layout";
+import { InformationsContext, SortConditionContext } from "@/app/layout";
 import { INITIAL_INFORMATION } from "@/app/consts/initial";
 import { changeDateFormat } from "../common/functions";
 import { addDoc, collection } from "firebase/firestore";
@@ -18,7 +11,7 @@ import { db } from "@/app/firebase";
 function SearchConditionButtons() {
 	const [quickTitle, setQuickTitle] = useState("");
 	const [isModalOpen, setIsModalOpen] = useState(false);
-	const [sortCondition, setSortCondition] = useState("");
+	const { sortCondition, setSortCondition } = useContext(SortConditionContext)!;
 	const { informations, setInformations } = useContext(InformationsContext)!;
 	/** モーダルを表示非表示を切り替える関数です。
 	 * @function
