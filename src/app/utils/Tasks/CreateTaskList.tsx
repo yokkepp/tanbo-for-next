@@ -1,12 +1,5 @@
 "use Client";
-import React, {
-	ChangeEvent,
-	Dispatch,
-	MouseEvent,
-	SetStateAction,
-	useContext,
-	useState,
-} from "react";
+import React, { ChangeEvent, MouseEvent, useContext, useState } from "react";
 import { CopyIcon, DeleteIcon } from "@chakra-ui/icons";
 import { collection, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "@/app/firebase";
@@ -23,13 +16,12 @@ import {
 	Thead,
 	Tr,
 } from "@chakra-ui/react";
-import { InformationsContext } from "@/app/layout";
-import { Information } from "@/app/types";
-
-type InformationsContext = {
-	informations: Information[];
-	setInformations: Dispatch<SetStateAction<Information[]>>;
-};
+import { InformationsContext, SortConditionContext } from "@/app/layout";
+import {
+	Information,
+	InformationsContextType,
+	SortConditionContextType,
+} from "@/app/types";
 
 /**
  * doneListまたはnotDoneListを引数に渡すことで、リストを生成するコンポーネントです。
@@ -43,8 +35,11 @@ export default function CreateTaskList({
 	informationList: Information[];
 	handleChangeCheckbox: (id: string) => Promise<void>;
 }) {
-	const { informations, setInformations }: InformationsContext =
+	const { informations, setInformations }: InformationsContextType =
 		useContext(InformationsContext)!;
+
+	const { sortCondition, setSortCondition }: SortConditionContextType =
+		useContext(SortConditionContext)!;
 
 	/**
 	 * informationsから任意のinformationを削除する関数です。
@@ -71,14 +66,17 @@ export default function CreateTaskList({
 		prop: "",
 		value: "",
 	});
-	//TODO: 各項目をクリックすると、編集することができる。
 
-	const handleChangeEditingValue = (e: any, id: string, prop: string) => {
+	const handleChangeEditingValue = (
+		e: ChangeEvent<HTMLInputElement>,
+		id: string,
+		prop: string
+	) => {
 		setEditingState({ id, prop, value: e.target.value });
 	};
 
 	const handleClick = (
-		e: React.MouseEvent<HTMLInputElement | HTMLDivElement>,
+		e: MouseEvent<HTMLInputElement | HTMLDivElement>,
 		id: string,
 		prop: string
 	) => {
@@ -137,22 +135,15 @@ export default function CreateTaskList({
 				<Thead bg={"gray.700"}>
 					<Tr>
 						<Th textColor={"white"} w={"70px"}></Th>
-						<Th textColor={"white"} w={"180px"}>
-							作成日
-						</Th>
-						<Th textColor={"white"} w={"400px"}>
-							タイトル
-						</Th>
-						<Th textColor={"white"} w={"80px"}>
+						<Th textColor={"white"}>作成日</Th>
+						<Th textColor={"white"}>タイトル</Th>
+						<Th textColor={"white"} w={"70px"}>
 							詳細
 						</Th>
-						<Th textColor={"white"} w={"180px"}>
-							開始予定
-						</Th>
-						<Th textColor={"white"} w={"180px"}>
-							終了予定
-						</Th>
-						<Th textColor={"white"} isNumeric>
+						<Th textColor={"white"}>期限</Th>
+						<Th textColor={"white"}>開始予定</Th>
+						<Th textColor={"white"}>終了予定</Th>
+						<Th textColor={"white"} w={"70px"} isNumeric>
 							進捗率(%)
 						</Th>
 						<Th textColor={"white"} w={"70px"}></Th>
@@ -206,9 +197,34 @@ export default function CreateTaskList({
 							</Td>
 							<Td textColor={"white"}>
 								{editingState.id === info.id &&
+								editingState.prop === "timeLimit" ? (
+									<Input
+										type='datetime-local'
+										value={editingState.value}
+										onChange={(e) =>
+											handleChangeEditingValue(e, info.id!, "timeLimit")
+										}
+										onBlur={handleBlurUpdateEditingValue}
+										border={"none"}
+										p={"0"}
+										_focus={{ outline: "none", boxShadow: "none" }}
+									/>
+								) : (
+									<Input
+										type='datetime-local'
+										value={info.timeLimit}
+										border={"none"}
+										isReadOnly={true}
+										p={"0"}
+										onClick={(e) => handleClick(e, info.id!, "timeLimit")}
+									/>
+								)}
+							</Td>
+							<Td textColor={"white"}>
+								{editingState.id === info.id &&
 								editingState.prop === "planStart" ? (
 									<Input
-										type='date'
+										type='datetime-local'
 										value={editingState.value}
 										onChange={(e) =>
 											handleChangeEditingValue(e, info.id!, "planStart")
@@ -220,7 +236,7 @@ export default function CreateTaskList({
 									/>
 								) : (
 									<Input
-										type='date'
+										type='datetime-local'
 										value={info.planStart}
 										border={"none"}
 										isReadOnly={true}
@@ -233,7 +249,7 @@ export default function CreateTaskList({
 								{editingState.id === info.id &&
 								editingState.prop === "planEnd" ? (
 									<Input
-										type='date'
+										type='datetime-local'
 										value={editingState.value}
 										onChange={(e) =>
 											handleChangeEditingValue(e, info.id!, "planEnd")
@@ -245,7 +261,7 @@ export default function CreateTaskList({
 									/>
 								) : (
 									<Input
-										type='date'
+										type='datetime-local'
 										value={info.planEnd}
 										border={"none"}
 										isReadOnly={true}
