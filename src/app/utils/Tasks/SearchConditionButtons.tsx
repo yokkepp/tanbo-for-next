@@ -7,6 +7,7 @@ import { INITIAL_INFORMATION } from "@/app/consts/initial";
 import { changeDateFormat } from "../common/functions";
 import { addDoc, collection } from "firebase/firestore";
 import { db } from "@/app/firebase";
+import { SortTypeString } from "@/app/types";
 
 function SearchConditionButtons() {
 	const [quickTitle, setQuickTitle] = useState("");
@@ -24,7 +25,7 @@ function SearchConditionButtons() {
 		setQuickTitle(e.target.value);
 	};
 
-	const handleSortCondition = (setting: string) => {
+	const handleSortCondition = (setting: SortTypeString) => {
 		setSortCondition(setting);
 		console.log(sortCondition);
 	};

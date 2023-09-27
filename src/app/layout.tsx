@@ -15,6 +15,7 @@ import {
 	Information,
 	InformationsContextType,
 	SortConditionContextType,
+	SortTypeString,
 } from "./types";
 
 export const InformationsContext =
@@ -33,7 +34,7 @@ export default function RootLayout({
 ------------------------------------------------------------*/
 
 	const [informations, setInformations] = useState<Information[]>([]);
-	const [sortCondition, setSortCondition] = useState("all");
+	const [sortCondition, setSortCondition] = useState<SortTypeString>("all");
 
 	//レンダリング時にfirebaseからデータを読み込む。
 	useEffect(() => {
