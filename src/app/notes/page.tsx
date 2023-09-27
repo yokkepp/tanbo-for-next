@@ -16,8 +16,6 @@ import {
 	doc,
 	updateDoc,
 	DocumentReference,
-	Firestore,
-	DocumentData,
 	collection,
 } from "firebase/firestore";
 import { InformationsContext } from "../layout";
